@@ -15,14 +15,19 @@
 Button pushButton(PUSHBUTTON_PIN_2);
 RGBLed rgbLed(RGBLED_PIN_R,RGBLED_PIN_G,RGBLED_PIN_B,rgbLed_TYPE);
 
-uint8_t rawhidData[8];
+// The size of the buffer for the HID device, 64 byte max
+// https://github.com/NicoHood/HID/issues/133#issuecomment-533946021
+// ************************ Note this doesn't work ****************
+// Able to receive data, but not send it back to the PC https://github.com/NicoHood/HID/issues/133
+
+uint8_t rawhidData[64];
+
 
 void setup()
 {
-
   pushButton.init();
   rgbLed.turnOff();
-  pinMode(LED_BUILTIN, OUTPUT);
+  // pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
   RawHID.begin(rawhidData, sizeof(rawhidData));
 }
@@ -31,22 +36,34 @@ void loop()
   // if button.onpress == true
   if(pushButton.onPress())
   {
-    Serial.println("yay");
-    rgbLed.setRGB(50,50,50);
+    // rgbLed.setRGB(50,50,50);
+    rawhidData[0] = 0x00;
+    rawhidData[1] = 0x04;
+    Serial.print("uploading data: ");
+    Serial.print(rawhidData[0]);
+    Serial.print(",");
+    Serial.print(rawhidData[1]);
+    RawHID.write(rawhidData, sizeof(rawhidData));
   }
 
-    // Check if there is new data from the RawHID device
+  // Check if there is new data from the RawHID device
   auto bytesAvailable = RawHID.available();
   if (bytesAvailable)
   {
-    digitalWrite(LED_BUILTIN, HIGH);
+    // digitalWrite(LED_BUILTIN, HIGH);
 
     // Mirror data via Serial
     while (bytesAvailable--) {
       auto data = RawHID.read();
 
       Serial.println(data);
-      
+      // Print out data
+      // for (auto i = 0; i < sizeof(data); i++) {
+      //   Serial.print(data[i], HEX);
+      //   Serial.print(" ");
+      // }
+
+
       // red = 0x01
       if (data == 1)
       {
@@ -57,13 +74,38 @@ void loop()
       {
         rgbLed.setRGB(0,255,0);
       }
+      // yellow = 0x03
+      if (data == 3)
+      {
+        rgbLed.setRGB(255,255,0);
+      }
       // blue = 0x04
       if (data == 4)
       {
         rgbLed.setRGB(0,0,255);
       }
+      // purple = 0x05
+      if (data == 5)
+      {
+        rgbLed.setRGB(255,0,255);
+      }
+      // cyan = 0x06
+      if (data == 6)
+      {
+        rgbLed.setRGB(0,255,255);
+      }
+      // white = 0x07
+      if (data == 7) 
+      {
+        rgbLed.setRGB(255,245,255);
+      }
+      // noColor = 0x00
+      if (data == 0)
+      {
+        rgbLed.turnOff();
+      }
 
     }
-    digitalWrite(LED_BUILTIN, LOW);
+    // digitalWrite(LED_BUILTIN, LOW);
   }
 }
