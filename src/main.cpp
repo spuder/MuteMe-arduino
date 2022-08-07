@@ -19,16 +19,23 @@ RGBLed rgbLed(RGBLED_PIN_R,RGBLED_PIN_G,RGBLED_PIN_B,rgbLed_TYPE);
 // https://github.com/NicoHood/HID/issues/133#issuecomment-533946021
 // ************************ Note this doesn't work ****************
 // Able to receive data, but not send it back to the PC https://github.com/NicoHood/HID/issues/133
+// https://arduino.stackexchange.com/questions/78880/send-custom-hid-values-instead-of-keys
+// https://learn.sparkfun.com/tutorials/hid-control-of-a-web-page/all
 
 uint8_t rawhidData[64];
 
-
 void setup()
 {
+
+  // fill rawhdidData with 0s
+  for (int i = 0; i < sizeof(rawhidData); i++) {
+    rawhidData[i] = 0;
+  }
   pushButton.init();
   rgbLed.turnOff();
   // pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
+  Keyboard.begin();
   RawHID.begin(rawhidData, sizeof(rawhidData));
 }
 void loop()
@@ -37,13 +44,19 @@ void loop()
   if(pushButton.onPress())
   {
     // rgbLed.setRGB(50,50,50);
-    rawhidData[0] = 0x00;
-    rawhidData[1] = 0x04;
-    Serial.print("uploading data: ");
-    Serial.print(rawhidData[0]);
-    Serial.print(",");
-    Serial.print(rawhidData[1]);
-    RawHID.write(rawhidData, sizeof(rawhidData));
+    // rawhidData[0] = 0x00; 
+    // rawhidData[1] = 0x04;
+    // Serial.print("uploading data: ");
+    // Serial.print(rawhidData[0]);
+    // Serial.print(",");
+    // Serial.print(rawhidData[1]);
+    // RawHID.write(rawhidData, sizeof(rawhidData));
+    Serial.println("Sending 0x04 to pc");
+    Keyboard.write(0x04);
+    delay(1000);
+    Keyboard.write(0x02);
+    Keyboard.write(0x00);
+    Keyboard.releaseAll();
   }
 
   // Check if there is new data from the RawHID device
