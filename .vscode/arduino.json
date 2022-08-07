@@ -1,0 +1,4 @@
+{
+    "board": "arduino:avr:micro",
+    "port": "/dev/tty.usbmodemC1"
+}
