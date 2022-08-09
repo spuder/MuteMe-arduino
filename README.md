@@ -1,7 +1,6 @@
-# ZoomMute
+# MuteMe-Arduino
 
 Use a microcontroller to mute zoom meetings
-
 
 
 ## Resources
@@ -26,57 +25,15 @@ Mute Me
 
 
 
-Find the boards.txt and change settings
-
-```
-mdfind boards.txt
-/Users/spencer.owen/Library/Arduino15/packages/arduino/hardware/avr/1.8.5/boards.txt
-/Users/spencer.owen/Library/Arduino15/packages/esp8266/hardware/esp8266/3.0.2/tools/boards.txt.py
-/Users/spencer.owen/Library/Arduino15/packages/esp8266/hardware/esp8266/3.0.2/boards.txt
-/Users/spencer.owen/Code/github/spuder/klipper/docs/Bootloaders.md
-```
-
-- https://community.platformio.org/t/changing-usb-device-vid-pid/3986/17
 
 
-List USB Devices (OSX)
+## Debugging
 
-`system_profiler SPUSBDataType`
+There are multiple options for debugging USB Connections. All options are terrible
 
-```
-USB Serial:
+Listed in order of least amount of terribleness
 
-  Product ID: 0x0483
-  Vendor ID: 0x16c0
-  Version: 2.71
-  Serial Number: 12345
-  Speed: Up to 12 Mb/s
-  Manufacturer: Teensyduino
-  Location ID: 0x01110000 / 5
-  Current Available (mA): 500
-  Current Required (mA): 100
-  Extra Operating Current (mA): 0
-```
+1. hidapitester https://github.com/todbot/hidapitester  
+2. rawhid.py https://www.pjrc.com/teensy/rawhid.html  
+3. rawhid (c++) https://www.pjrc.com/teensy/rawhid.html  
 
-Setting Product ID and Vendor ID
-
-- Use FT Prog (windows only) https://ftdichip.com/utilities/
-
-https://community.platformio.org/t/changing-usb-device-vid-pid/3986/23?u=owenspencer
-
-HID Data
-
-Once every 5 seconds, MuteMe sends the following
-
-- 19
-- 83
-
-Unmuting
-
-- 23
-- 87
-
-Muting
-
-- 19
-- 83

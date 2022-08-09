@@ -1,18 +1,8 @@
+// This isn't working, but including for reference
+// Button.h and RGBLeh.h were generated at https://www.circuito.io/static/reply/index.html
+
 #include <Arduino.h>
-
-// MuteMe needs to send 0x01 - 0x02 to the PC depending on button state
-// We _could_ create a new keyboard layout and mapping, but it is easier
-// to just reuse the unused mappings already defined here: 
-// https://github.com/NicoHood/HID/blob/master/src/KeyboardLayouts/ImprovedKeylayouts.h#L300-L304
-// Additional information: https://github.com/NicoHood/HID/wiki/Keyboard-API#keyboard-layouts
-// HID_KEYBOARD_ERROR_ROLLOVER = 0x01,
-// HID_KEYBOARD_POST_FAIL  = 0x02,
-// HID_KEYBOARD_ERROR_UNDEFINED    = 0x03,
-// HID_KEYBOARD_A_AND_A    = 0x04,
-// HID_KEYBOARD_B_AND_B    = 0x05,
-
 #include "HID-Project.h"
-#include <HID-Settings.h>
 #include <Button.h>
 #include <RGBLed.h>
 
@@ -35,18 +25,19 @@ RGBLed rgbLed(RGBLED_PIN_R,RGBLED_PIN_G,RGBLED_PIN_B,rgbLed_TYPE);
 // https://arduino.stackexchange.com/questions/78880/send-custom-hid-values-instead-of-keys
 // https://learn.sparkfun.com/tutorials/hid-control-of-a-web-page/all
 
-uint8_t rawhidData[255];
+uint8_t rawhidData[64];
 
 void setup()
 {
+
   // fill rawhdidData with 0s
-  // for (int i = 0; i < 255; i++) {
-  //   rawhidData[i] = 0;
-  // }
+  for (int i = 0; i < sizeof(rawhidData); i++) {
+    rawhidData[i] = 0;
+  }
   pushButton.init();
   rgbLed.turnOff();
   // pinMode(LED_BUILTIN, OUTPUT);
-  // Serial.begin(9600);
+  Serial.begin(9600);
   Keyboard.begin();
   RawHID.begin(rawhidData, sizeof(rawhidData));
 }
@@ -63,41 +54,32 @@ void loop()
     // Serial.print(",");
     // Serial.print(rawhidData[1]);
     // RawHID.write(rawhidData, sizeof(rawhidData));
-    // Serial.println("Sending 0x04 to pc");
-    // Keyboard.write(HID_CONSUMER_MICROPHONE_CA);
-    // delay(1000);
-    // Keyboard.write(HID_KEYBOARD_POST_FAIL);
-    // // Keyboard.write(0x00);
-    // Keyboard.releaseAll();
-
-    // https://arduino.stackexchange.com/questions/78880/send-custom-hid-values-instead-of-keys
-    // uint8_t megabuff[1];
-    // megabuff[0] = 0x04;
-    // RawHID.write(megabuff, 1);
-    uint8_t megabuff[64];
-    for (uint8_t i = 0; i < sizeof(megabuff); i++) {
-        megabuff[i] = 0x00;
-    }
-    megabuff[3] = 0x04;
-    RawHID.write(megabuff, sizeof(megabuff));
-    delay(100);
-    megabuff[3] = 0x01;
-    RawHID.write(megabuff, sizeof(megabuff));
-    delay(100);
-    megabuff[3] = 0x02;
-    RawHID.write(megabuff, sizeof(megabuff));
-    megabuff[3] = 0x00; // reset back to 0
-
+    Serial.println("Sending 0x04 to pc");
+    Keyboard.write(0x04);
+    delay(1000);
+    Keyboard.write(0x02);
+    Keyboard.write(0x00);
+    Keyboard.releaseAll();
   }
 
   // Check if there is new data from the RawHID device
   auto bytesAvailable = RawHID.available();
   if (bytesAvailable)
   {
+    // digitalWrite(LED_BUILTIN, HIGH);
+
     // Mirror data via Serial
     while (bytesAvailable--) {
       auto data = RawHID.read();
-      // Serial.println(data);
+
+      Serial.println(data);
+      // Print out data
+      // for (auto i = 0; i < sizeof(data); i++) {
+      //   Serial.print(data[i], HEX);
+      //   Serial.print(" ");
+      // }
+
+
       // red = 0x01
       if (data == 1)
       {
@@ -134,12 +116,11 @@ void loop()
         rgbLed.setRGB(255,245,255);
       }
       // noColor = 0x00
-      // TODO: Clear is actually 2 bytes 0x00 0x00, not just 1
       if (data == 0)
       {
-        rgbLed.setRGB(0,0,0);
         rgbLed.turnOff();
       }
+
     }
     // digitalWrite(LED_BUILTIN, LOW);
   }
