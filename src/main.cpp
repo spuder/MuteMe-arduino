@@ -6,9 +6,11 @@
 uint8_t rawhidData[64];
 Button button1(2);
 
+unsigned long buttonCheckMillis;
 
 void setup()
 {
+  buttonCheckMillis = millis();
   button1.begin();
   for (auto i = 0; i < sizeof(rawhidData); i++)
   {
@@ -37,4 +39,19 @@ void loop()
         rawhidData[3] = 0x00;
     }
   }
+  if (millis() - buttonCheckMillis > 250) {
+    buttonCheckMillis = millis();
+    if (button1.read() == Button::PRESSED) {
+        #ifdef DEBUG
+          Serial.println("Button Held");
+        #endif
+        rawhidData[3] = 0x01;
+        RawHID.write(rawhidData, sizeof(rawhidData));
+        rawhidData[3] = 0x00;
+    }
+  }
+
+
+
+
 }
