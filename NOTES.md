@@ -311,3 +311,26 @@ Reading 64-byte input report 0, 250 msec timeout...read 8 bytes:
  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
  ```
+
+
+ Need to hook arduino up to pin that supports external interupts
+
+ https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/hardware-overview-pro-micro
+
+ Arudino Pro Micro has
+
+ - pin 3 = INT 0
+ - pin 2 = INT 1
+ - pin 0 = INT 2
+ - pin 1 = INT 3
+ - pin 7 = INT 4
+
+https://learn.sparkfun.com/tutorials/pro-micro--fio-v3-hookup-guide/hardware-overview-pro-micro
+
+
+USB VID:PID=16C0:27DB SER=C LOCATION=1-1.1
+
+hidapitester --vidpid 16C0:27DB --open
+hidapitester --vidpid 16C0:27DB --open --length 64 --read-input-forever --close
+hidapitester --vidpid 16C0/27DB --usagePage FFC0 --usage 0C00 --open --length 64 --read-input-forever --close
+hidapitester --vidpid 16C0:27DB --usagePage FFC0 --usage 0C00 --open --length 64 --read-input-forever --close
