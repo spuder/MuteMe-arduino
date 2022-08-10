@@ -25,15 +25,7 @@ Mute Me
 
 
 
-
-
 ## Debugging
 
-There are multiple options for debugging USB Connections. All options are terrible
-
-Listed in order of least amount of terribleness
-
-1. hidapitester https://github.com/todbot/hidapitester  
-2. rawhid.py https://www.pjrc.com/teensy/rawhid.html  
-3. rawhid (c++) https://www.pjrc.com/teensy/rawhid.html  
-
+Note: The MuteMe software can only _receive_ input from the arduino if there is only 1 UID per device (e.g. `build_flags = -D USB_HID`). 
+Attempting to use `build_flags = -D USB_SERIAL_HID` will allow you to add debugging statements like `Serial.println()`, however it will result in multiple HID devices being registered on a single USB port which will confuse Mute Me. Any button presses will not be detected by the Mute Me Software. If you know a way to work arround this, pull requests welcome and encouraged. 
