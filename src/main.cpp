@@ -21,31 +21,34 @@ void setup()
 
 void loop()
 {
+  // User pressed the button
   if (button1.toggled()) {
     if (button1.read() == Button::PRESSED) {
         #ifdef DEBUG
           Serial.println("Button Pressed");
         #endif
-        rawhidData[3] = 0x04;
+        rawhidData[3] = 0x04; // Touch Button
         RawHID.write(rawhidData, sizeof(rawhidData));
         rawhidData[3] = 0x00;
     }
+    // User released the button
     else {
         #ifdef DEBUG
           Serial.println("Button Pressed");
         #endif
-        rawhidData[3] = 0x02;
+        rawhidData[3] = 0x02; // Release Button
         RawHID.write(rawhidData, sizeof(rawhidData));
         rawhidData[3] = 0x00;
     }
   }
-  if (millis() - buttonCheckMillis > 250) {
+  // Poll every 100 milliseconds to see if user is still holding button
+  if (millis() - buttonCheckMillis > 100) {
     buttonCheckMillis = millis();
     if (button1.read() == Button::PRESSED) {
         #ifdef DEBUG
           Serial.println("Button Held");
         #endif
-        rawhidData[3] = 0x01;
+        rawhidData[3] = 0x01; // Hold Button
         RawHID.write(rawhidData, sizeof(rawhidData));
         rawhidData[3] = 0x00;
     }
