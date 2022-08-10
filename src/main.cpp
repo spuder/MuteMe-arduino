@@ -6,7 +6,7 @@
 
 # define BUTTON_PIN 2
 int buttonHoldDuration = 250;
-EasyButton button(BUTTON_PIN);
+EasyButton button(BUTTON_PIN, 35, true, true); // pin, debounce_time, pullup_enable, invert
 
 #define RGBLED_PIN_B	3
 #define RGBLED_PIN_G	5
@@ -41,6 +41,7 @@ void onPressedCallback() {
 }
 
 void onHoldCallback() {
+
   if (button.isPressed())
   {
       #ifdef DEBUG
@@ -86,6 +87,11 @@ void onHoldCallback() {
 //   RawHID.begin(rawhidData, sizeof(rawhidData));
 // }
 
+void buttonISR()
+{
+  button.read(); //TODO: Docs say you must provide an interupt, but examples don't have this. 
+}
+
 void setup()
 {
   #ifdef DEBUG
@@ -93,6 +99,9 @@ void setup()
   #endif
 
   button.begin();
+  if (button.supportsInterrupt()) {
+    button.enableInterrupt(buttonISR);
+  }
   button.onPressed(onPressedCallback);
   button.onPressedFor(buttonHoldDuration, onHoldCallback);
   // button.wasReleased(onReleaseCallback);
