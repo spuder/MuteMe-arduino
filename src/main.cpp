@@ -41,32 +41,12 @@ void onPressedCallback() {
 }
 
 void onHoldCallback() {
-
-  if (button.isPressed())
-  {
-      #ifdef DEBUG
-        Serial.println("Button hold");
-      #endif
-      usbOutputData[3] = 0x01; // 0x01 = touching
-      RawHID.begin(usbOutputData, sizeof(usbOutputData));
-      usbOutputData[3] = 0x00; // reset to 0x00
-  }
-  else if (button.isReleased())
-  {
-      #ifdef DEBUG
-        Serial.println("Button released");
-      #endif
-      usbOutputData[3] = 0x02; // 0x02 = end touching
-      RawHID.begin(usbOutputData, sizeof(usbOutputData));
-      usbOutputData[3] = 0x00; // reset to 0x00
-  } 
-  else {
-    #ifdef DEBUG
-      Serial.println("Unknown button state");
-      usbOutputData[3] = 0x00; // reset to 0x00
-      RawHID.begin(usbOutputData, sizeof(usbOutputData));
-    #endif
-  }
+  #ifdef DEBUG
+    Serial.println("Button hold");
+  #endif
+  usbOutputData[3] = 0x01; // 0x01 = touching
+  RawHID.begin(usbOutputData, sizeof(usbOutputData));
+  usbOutputData[3] = 0x00; // reset to 0x00
 }
 
 // void onReleaseCallback() {
@@ -78,17 +58,10 @@ void onHoldCallback() {
 //   usbOutputData[0] = 0x00; // reset to 0x00
 // }
 
-// void onRelease() {
-//   uint8_t megabuff[64];
-//   for (uint8_t i = 0; i < sizeof(megabuff); i++) {
-//     megabuff[i] = 0x00;
-//   }
-//   rawhidData[0] = 0x02; // 0x02 = release
-//   RawHID.begin(rawhidData, sizeof(rawhidData));
-// }
 
 void buttonISR()
 {
+  // https://github.com/evert-arias/EasyButton/blob/main/examples/InterruptsOnPressedFor/InterruptsOnPressedFor.ino#L29
   button.read(); //TODO: Docs say you must provide an interupt, but examples don't have this. 
 }
 
@@ -119,6 +92,19 @@ void setup()
 void loop()
 {
   button.read();
+  button.update();
+  // This doesn't work
+  if (button.wasReleased()) {
+    #ifdef DEBUG
+      Serial.println("Button Released");
+    #endif
+    // usbOutputData[0] = 0x02; // 0x02 = End Touch
+    // RawHID.begin(usbOutputData, sizeof(usbOutputData));
+    // usbOutputData[0] = 0x00; // reset to 0x00
+    button.update();
+  }
+
+
   // Check if there is new data from the RawHID device
   auto bytesAvailable = RawHID.available();
   if (bytesAvailable)
