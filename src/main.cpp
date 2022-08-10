@@ -8,6 +8,10 @@
 int buttonHoldDuration = 250;
 EasyButton button(BUTTON_PIN, 35, true, true); // pin, debounce_time, pullup_enable, invert
 
+//create millisecond varible to track time elapse
+unsigned long touchMilliseconds = 0;
+bool buttonHeld = false;
+
 #define RGBLED_PIN_B	3
 #define RGBLED_PIN_G	5
 #define RGBLED_PIN_R	6
@@ -29,25 +33,25 @@ uint8_t usbOutputData[64]; //TODO: optimize. Mostlikely 4 bytes is enough
 //   rawhidData[0] = 0x04; // 04 = touch
 //   RawHID.begin(rawhidData, sizeof(rawhidData));
 // }
-void onPressedCallback() {
-  #ifdef DEBUG
-    Serial.println("Button Pressed and Released");
-  #endif
-  usbOutputData[3] = 0x04; // 0x04 = touching
-  RawHID.begin(usbOutputData, sizeof(usbOutputData));
-  usbOutputData[3] = 0x02; // 0x02 = end touching
-  RawHID.begin(usbOutputData, sizeof(usbOutputData));
-  usbOutputData[3] = 0x00; // reset to 0x00
-}
+// void onPressedCallback() {
+//   #ifdef DEBUG
+//     Serial.println("Button Pressed and Released");
+//   #endif
+//   usbOutputData[3] = 0x04; // 0x04 = touching
+//   RawHID.begin(usbOutputData, sizeof(usbOutputData));
+//   usbOutputData[3] = 0x02; // 0x02 = end touching
+//   RawHID.begin(usbOutputData, sizeof(usbOutputData));
+//   usbOutputData[3] = 0x00; // reset to 0x00
+// }
 
-void onHoldCallback() {
-  #ifdef DEBUG
-    Serial.println("Button hold");
-  #endif
-  usbOutputData[3] = 0x01; // 0x01 = touching
-  RawHID.begin(usbOutputData, sizeof(usbOutputData));
-  usbOutputData[3] = 0x00; // reset to 0x00
-}
+// void onHoldCallback() {
+//   #ifdef DEBUG
+//     Serial.println("Button hold");
+//   #endif
+//   usbOutputData[3] = 0x01; // 0x01 = touching
+//   RawHID.begin(usbOutputData, sizeof(usbOutputData));
+//   usbOutputData[3] = 0x00; // reset to 0x00
+// }
 
 // void onReleaseCallback() {
 //   #ifdef DEBUG
@@ -58,12 +62,11 @@ void onHoldCallback() {
 //   usbOutputData[0] = 0x00; // reset to 0x00
 // }
 
-
-void buttonISR()
-{
-  // https://github.com/evert-arias/EasyButton/blob/main/examples/InterruptsOnPressedFor/InterruptsOnPressedFor.ino#L29
-  button.read(); //TODO: Docs say you must provide an interupt, but examples don't have this. 
-}
+// void writeToUSB(int data) {
+//   usbOutputData[3] = data;
+//   RawHID.begin(usbOutputData, sizeof(usbOutputData));
+//   usbOutputData[3] = 0x00;
+// }
 
 void setup()
 {
@@ -91,19 +94,47 @@ void setup()
 }
 void loop()
 {
-  button.read();
-  button.update();
-  // This doesn't work
-  if (button.wasReleased()) {
-    #ifdef DEBUG
-      Serial.println("Button Released");
-    #endif
-    // usbOutputData[0] = 0x02; // 0x02 = End Touch
-    // RawHID.begin(usbOutputData, sizeof(usbOutputData));
-    // usbOutputData[0] = 0x00; // reset to 0x00
-    button.update();
+  if (button1.toggled()) {
+    if (button1.read() == Button::PRESSED) {
+        #ifdef DEBUG
+          Serial.println("Button 1 has been pressed");
+        #endif
+        buttonHeld = true;
+        // writeToUSB(0x04);
+        usbOutputData[3] = 0x04;
+        RawHID.begin(usbOutputData, sizeof(usbOutputData));
+        usbOutputData[3] = 0x00;
+    }
+    else {
+        #ifdef DEBUG
+          Serial.println("Button 1 has been released");
+        #endif
+        buttonHeld = false;
+        // writeToUSB(0x02);
+        usbOutputData[3] = 0x02;
+        RawHID.begin(usbOutputData, sizeof(usbOutputData));
+        usbOutputData[3] = 0x00;
+    }
   }
+  // if (buttonHeld == true ) {
+  //   if (button1.read() == Button::PRESSED) {
+  //     #ifdef DEBUG
+  //       Serial.println("Button 1 is held");
+  //     #endif
+  //     // writeToUSB(0x01);
+  //     usbOutputData[3] = 0x01;
+  //     RawHID.begin(usbOutputData, sizeof(usbOutputData));
+  //     usbOutputData[3] = 0x00;
+  //   }
+  // }
 
+  // if (button1.toggled()) {
+  //   if (button1.read() == Button::PRESSED) {
+  //     #ifdef DEBUG
+  //       Serial.println("Button Held");
+  //     #endif
+  //   }
+  // }
 
   // Check if there is new data from the RawHID device
   auto bytesAvailable = RawHID.available();
