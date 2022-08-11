@@ -100,15 +100,15 @@ void muteMe2Color(unsigned int data)
       }
       break;
     case 5:
-      rgbLed.brightness(RGBLed::PURPLE, brightness);
+      rgbLed.brightness(RGBLed::MAGENTA, brightness);
       if (fasePulse == true) {
-        rgbLed.fadeIn(RGBLed::PURPLE, 10, 600);
-        rgbLed.fadeOut(RGBLed::PURPLE, 10, 600);
+        rgbLed.fadeIn(RGBLed::MAGENTA, 10, 600);
+        rgbLed.fadeOut(RGBLed::MAGENTA, 10, 600);
       } else if (slowPulse == true) {
-        rgbLed.fadeIn(RGBLed::PURPLE, 24, 2000);
-        rgbLed.fadeOut(RGBLed::PURPLE, 24, 2000);
+        rgbLed.fadeIn(RGBLed::MAGENTA, 24, 2000);
+        rgbLed.fadeOut(RGBLed::MAGENTA, 24, 2000);
       } else {
-        rgbLed.setColor(RGBLed::PURPLE);
+        rgbLed.setColor(RGBLed::MAGENTA);
       }
       break;
     case 6: //cyan
@@ -138,10 +138,7 @@ void muteMe2Color(unsigned int data)
     case 0:
       rgbLed.off();
       break;
-
-
   }
-  
 }
 
 void setup()
@@ -195,10 +192,10 @@ void loop()
 // TODO: imeplement LED Logic
 
   if (millis() % 1000 == 0) {
-    muteMe2Color(0x21);
+    muteMe2Color(0x01);
   }
-  // if (millis() % 1500 == 0) {
-  //   muteMe2Color(0x02);
-  // }
+  if (millis() % 2000 == 0) {
+    muteMe2Color(0x00);
+  }
 
 }

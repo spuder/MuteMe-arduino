@@ -10,7 +10,10 @@ Visually see if you are muted in a zoom/teams meeting, and control your micropho
 
 Most likely not. An official MuteMe-mini is only $19 with free shipping which is likely about the same or *more* than it would cost to bulid with anarduino. You are highly encouraged to support the origional creators. 
 
+
 Where this project *does* make sense, is if you have a  mechanical keyboard or macro pad with a micro controller that supports HID emulation, and you want an embedded zoom button. 
+
+
 
 - [Adafruit MacroPad](https://www.adafruit.com/product/5128)  
 - [Adafruit FeatherWing](https://www.adafruit.com/product/4979)
@@ -113,7 +116,7 @@ The physical device sends 4 bytes back to the Mute Me software.
 **Note: MuteMe and hidapitester will have conflicts. You must close the MuteMe software to view output from the physical device** 
 
 
-Note that while we only need to send 4 bytes, there is a bug in the HID-Project library that requires 64 bytes be sent. 
+Note that while we only need to send 4 bytes, [there is a bug in the HID-Project library](https://github.com/NicoHood/HID/issues/133) that requires `64` bytes be sent. 
 
 02 = Button was released event
 ```
@@ -150,3 +153,11 @@ Reading 64-byte input report 0, 250 msec timeout...read 8 bytes:
 
 Note: The MuteMe software can only _receive_ input from the arduino if there is only 1 UID per device (e.g. `build_flags = -D USB_HID`). 
 Attempting to use `build_flags = -D USB_SERIAL_HID` will allow you to add debugging statements like `Serial.println()`, however it may result in multiple HID devices being registered on a single USB port which can confuse Mute Me software. Any button presses may not be detected by the Mute Me Software while in Serial mode. If you know a way to work arround this limitation, pull requests are welcome and encouraged. 
+
+
+## Warning
+
+This project is provided for eduacational purposes only. Comercial products are prohibited.  
+
+MuteMe-Arduino is licensed under the [Creative Commons Non Commercial ShareAlike](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. 
+
