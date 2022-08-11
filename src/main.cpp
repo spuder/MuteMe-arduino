@@ -141,8 +141,10 @@ void muteMe2Color(unsigned int data)
     default:
       #ifdef DEBUG
         Serial.print("Ignoring data");
-        Serial.println(data);
+        Serial.println(data, HEX);
       #endif
+      break;
+      
   }
 }
 
@@ -182,7 +184,7 @@ void loop()
     }
   }
   // Poll every 100 milliseconds to see if user is still holding button
-  if (millis() - buttonCheckMillis > 100) {
+  if (millis() - buttonCheckMillis > 50) {
     buttonCheckMillis = millis();
     if (button1.read() == Button::PRESSED) {
         #ifdef DEBUG
