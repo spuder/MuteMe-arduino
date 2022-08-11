@@ -88,15 +88,15 @@ void muteMe2Color(unsigned int data)
       }
       break;
     case 4:
-      rgbLed.brightness(RGBLed::BLUE, brightness);
+      rgbLed.brightness(RGBLed::YELLOW, brightness);
       if (fasePulse == true) {
-        rgbLed.fadeIn(RGBLed::BLUE, 10, 600);
+        rgbLed.fadeIn(RGBLed::YELLOW, 10, 600);
         rgbLed.fadeOut(RGBLed::YELLOW, 10, 600);
       } else if (slowPulse == true) {
-        rgbLed.fadeIn(RGBLed::BLUE, 24, 2000);
-        rgbLed.fadeOut(RGBLed::BLUE, 24, 2000);
+        rgbLed.fadeIn(RGBLed::YELLOW, 24, 2000);
+        rgbLed.fadeOut(RGBLed::YELLOW, 24, 2000);
       } else {
-        rgbLed.setColor(RGBLed::BLUE);
+        rgbLed.setColor(RGBLed::YELLOW);
       }
       break;
     case 5:
@@ -138,6 +138,11 @@ void muteMe2Color(unsigned int data)
     case 0:
       rgbLed.off();
       break;
+    default:
+      #ifdef DEBUG
+        Serial.print("Ignoring data");
+        Serial.println(data);
+      #endif
   }
 }
 
@@ -189,13 +194,16 @@ void loop()
     }
   }
 
-// TODO: imeplement LED Logic
-
-  if (millis() % 1000 == 0) {
-    muteMe2Color(0x01);
+  auto bytesAvailable = RawHID.available();
+  if (bytesAvailable)
+  {
+    while (bytesAvailable--) {
+      auto hidData = RawHID.read();
+      #ifdef DEBUG
+        Serial.print(hidData, HEX); //TODO: Neither HEX nor DEC print properly
+        Serial.println(" ");
+      #endif
+      muteMe2Color(hidData);
+    }
   }
-  if (millis() % 2000 == 0) {
-    muteMe2Color(0x00);
-  }
-
 }

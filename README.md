@@ -101,6 +101,7 @@ hidapitester --vidpid 20A0/42DB --open --length 2 --send-feature 0x04 --close
 
 Turn LED Blue with fast blink
 ```
+
 hidapitester --vidpid 20A0/42DB --open --length 2 --send-feature 0x25 --close
 ```
 
