@@ -1,6 +1,6 @@
 # MuteMe-Arduino
 
-MuteMe-Arduino is an open source imlementation of the wildly populare MuteMe hardware device. 
+MuteMe-Arduino is an open source imlementation of the wildly populare [MuteMe hardware device](https://muteme.com/). 
 
 Visually see if you are muted in a zoom/teams meeting, and control your microphone with the touch of a button. 
 
@@ -67,6 +67,44 @@ Note that regardless of what model you choose, you will most likely see this war
 
 ![](https://imgur.com/jQLlJLS.png)
 
+Additional information available on the [MuteMe](https://muteme.com/pages/muteme-hid-key) website
+
+
+Official MuteMe VendorID/ProductId/UagePage/Usage
+```
+hidapitester --list-detail
+
+20A0/42DB: muteme.com - MuteMe-Mini
+  vendorId:      0x20A0
+  productId:     0x42DB
+  usagePage:     0x0009
+  usage:         0x0006
+  serial_number:  
+  interface:     0 
+  path: IOService:/AppleARMPE/arm-io/AppleT600xIO/usb-drd1@2280000/AppleT6000USBXHCI@01000000/usb-drd1-port-hs@01100000/MuteMe-Mini@01100000/IOUSBHostInterface@0/AppleUserUSBHostHIDDevice
+```
+
+Compare to an arudino pro mini in USB_SERIAL_HID mode (2 virtual devices)
+
+```
+16C0/27DB: SparkFun - SparkFun Pro Micro
+  vendorId:      0x16C0
+  productId:     0x27DB
+  usagePage:     0x0001
+  usage:         0x0006
+  serial_number: CHIDLD 
+  interface:     3 
+  path: IOService:/AppleARMPE/arm-io/AppleT600xIO/usb-drd2@2280000/AppleT6000USBXHCI@02000000/usb-drd2-port-hs@02100000/USB2.0 Hub@02100000/AppleUSB20Hub@02100000/AppleUSB20HubPort@02110000/SparkFun Pro Micro@02110000/IOUSBHostInterface@3/AppleUserUSBHostHIDDevice
+
+16C0/27DB: SparkFun - SparkFun Pro Micro
+  vendorId:      0x16C0
+  productId:     0x27DB
+  usagePage:     0xFFC0
+  usage:         0x0C00
+  serial_number: CHIDLD 
+  interface:     2 
+  path: IOService:/AppleARMPE/arm-io/AppleT600xIO/usb-drd2@2280000/AppleT6000USBXHCI@02000000/usb-drd2-port-hs@02100000/USB2.0 Hub@02100000/AppleUSB20Hub@02100000/AppleUSB20HubPort@02110000/SparkFun Pro Micro@02110000/IOUSBHostInterface@2/AppleUserUSBHostHIDDevice
+  ```
 
 ### Input
 
