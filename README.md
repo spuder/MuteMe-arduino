@@ -145,13 +145,13 @@ Turn LED Blue
 ```
 # Change '20A0/42DB' to your appropriate VID/PID
 hidapitester --list-detail
-hidapitester --vidpid 20A0/42DB --open --length 2 --send-feature 0x04 --close
+hidapitester --vidpid 20A0/42DB --open --length 1 --send-feature 0x04 --close
 ```
 
 Turn LED Magenta with fast blink
 ```
 
-hidapitester --vidpid 20A0/42DB --open --length 2 --send-feature 0x25 --close
+hidapitester --vidpid 20A0/42DB --open --length 1 --send-feature 0x25 --close
 ```
 
 Turn off LED
