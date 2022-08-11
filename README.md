@@ -6,6 +6,10 @@ Visually see if you are muted in a zoom/teams meeting, and control your micropho
 
 ![](https://imgur.com/ZmdYOMP.png)
 
+![](https://imgur.com/1W8cwSW.png)
+
+![](https://imgur.com/3XjUq6J.png)
+
 ## Building
 
 **Q: Should you build this?**
