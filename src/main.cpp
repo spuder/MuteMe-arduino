@@ -144,7 +144,7 @@ void muteMe2Color(unsigned int data)
         Serial.println(data, HEX);
       #endif
       break;
-      
+
   }
 }
 
@@ -183,7 +183,8 @@ void loop()
         rawhidData[3] = 0x00;
     }
   }
-  // Poll every 100 milliseconds to see if user is still holding button
+  // Poll every 50 milliseconds to see if user is still holding button
+  // TODO: This is a little slow. Find a way to make it more responsive.
   if (millis() - buttonCheckMillis > 50) {
     buttonCheckMillis = millis();
     if (button1.read() == Button::PRESSED) {
@@ -206,6 +207,7 @@ void loop()
         Serial.println(" ");
       #endif
       muteMe2Color(hidData);
+      // TODO: Support multiple bytes 0x00 0x00 (clear)
     }
   }
 }
