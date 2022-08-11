@@ -334,3 +334,6 @@ hidapitester --vidpid 16C0:27DB --open
 hidapitester --vidpid 16C0:27DB --open --length 64 --read-input-forever --close
 hidapitester --vidpid 16C0/27DB --usagePage FFC0 --usage 0C00 --open --length 64 --read-input-forever --close
 hidapitester --vidpid 16C0:27DB --usagePage FFC0 --usage 0C00 --open --length 64 --read-input-forever --close
+
+
+hidapitester --vidpid 16C0:27DB --open --length 64 --read-input-forever --close
