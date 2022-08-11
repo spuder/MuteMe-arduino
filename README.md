@@ -46,6 +46,10 @@ Put a ~300-400 ohm resistor on each leg of the RGB Led
 #define rgbLed_TYPE RGBLed::COMMON_ANODE
 
 
+Note: Pull up resistor on button is not required since Arduino Pro mini has internal pull up on pin 2
+
+![](https://imgur.com/jvcYaVM.png)
+
 ## Tech Specs
 
 It is possible to have up to 3 MuteMe devices connected to 1 computer simultaniously, as long as they each have a different VID/PID. The VID/PID MuteMe provides are shown below. 
