@@ -144,7 +144,6 @@ void muteMe2Color(unsigned int data)
         Serial.println(data, HEX);
       #endif
       break;
-
   }
 }
 

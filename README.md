@@ -4,15 +4,16 @@ MuteMe-Arduino is an open source imlementation of the wildly populare [MuteMe ha
 
 Visually see if you are muted in a zoom/teams meeting, and control your microphone with the touch of a button. 
 
+![](https://imgur.com/ZmdYOMP.png)
+
 ## Building
 
 **Q: Should you build this?**
 
-Most likely not. An official MuteMe-mini is only $19 with free shipping which is likely about the same or *more* than it would cost to bulid with anarduino. You are highly encouraged to support the origional creators. 
+Most likely not. An official MuteMe-mini is only $19 with free shipping which is likely about the same or *more* than it would cost to bulid with an arduino. You are highly encouraged to support the origional creators. 
 
 
 Where this project *does* make sense, is if you have a  mechanical keyboard or macro pad with a micro controller that supports HID emulation, and you want an embedded zoom button. 
-
 
 
 - [Adafruit MacroPad](https://www.adafruit.com/product/5128)  
@@ -36,15 +37,17 @@ If you get a board working and want to add it to the `platformio.ini`, pull requ
 ### Arduino Pro Micro
 
 On an arduino pro micro, connect the buttons and leds to the following pins. 
-When building you may select either 5v or 3.3v (doesn't matter for this project). 
 Put a ~300-400 ohm resistor on each leg of the RGB Led
 
+You can use a common cathode or common anode LED. If using a common cathod you will need to change the variable `rgbLed_TYPE` 
+
+```
 #define BUTTON_PIN 2
 #define BLUE_PIN	3
 #define GREEN_PIN	5
 #define RED_PIN	6
 #define rgbLed_TYPE RGBLed::COMMON_ANODE
-
+```
 
 Note: Pull up resistor on button is not required since Arduino Pro mini has internal pull up on pin 2
 
