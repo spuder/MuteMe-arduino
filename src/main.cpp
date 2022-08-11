@@ -185,6 +185,7 @@ void loop()
   }
   // Poll every 50 milliseconds to see if user is still holding button
   // TODO: This is a little slow. Find a way to make it more responsive.
+  // https://github.com/spuder/MuteMe-arduino/issues/2
   if (millis() - buttonCheckMillis > 50) {
     buttonCheckMillis = millis();
     if (button1.read() == Button::PRESSED) {
@@ -208,6 +209,7 @@ void loop()
       #endif
       muteMe2Color(hidData);
       // TODO: Support multiple bytes 0x00 0x00 (clear)
+      // https://github.com/spuder/MuteMe-arduino/issues/1
     }
   }
 }
