@@ -122,7 +122,7 @@ red = 0x01
 green = 0x02
 yellow = 0x03
 blue = 0x04
-purple = 0x05
+purple(magenta) = 0x05
 cyan = 0x06
 white = 0x07
 noColor = 0x00
@@ -148,7 +148,7 @@ hidapitester --list-detail
 hidapitester --vidpid 20A0/42DB --open --length 2 --send-feature 0x04 --close
 ```
 
-Turn LED Blue with fast blink
+Turn LED Magenta with fast blink
 ```
 
 hidapitester --vidpid 20A0/42DB --open --length 2 --send-feature 0x25 --close

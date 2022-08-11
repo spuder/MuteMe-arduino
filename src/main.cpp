@@ -88,15 +88,15 @@ void muteMe2Color(unsigned int data)
       }
       break;
     case 4:
-      rgbLed.brightness(RGBLed::YELLOW, brightness);
+      rgbLed.brightness(RGBLed::BLUE, brightness);
       if (fasePulse == true) {
-        rgbLed.fadeIn(RGBLed::YELLOW, 10, 600);
-        rgbLed.fadeOut(RGBLed::YELLOW, 10, 600);
+        rgbLed.fadeIn(RGBLed::BLUE, 10, 600);
+        rgbLed.fadeOut(RGBLed::BLUE, 10, 600);
       } else if (slowPulse == true) {
-        rgbLed.fadeIn(RGBLed::YELLOW, 24, 2000);
-        rgbLed.fadeOut(RGBLed::YELLOW, 24, 2000);
+        rgbLed.fadeIn(RGBLed::BLUE, 24, 2000);
+        rgbLed.fadeOut(RGBLed::BLUE, 24, 2000);
       } else {
-        rgbLed.setColor(RGBLed::YELLOW);
+        rgbLed.setColor(RGBLed::BLUE);
       }
       break;
     case 5:
