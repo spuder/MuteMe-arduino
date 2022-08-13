@@ -13,7 +13,6 @@ uint8_t rawhidData[64];
 Button button1(BUTTON_PIN);
 unsigned long buttonCheckMillis;
 
-
 // LED Setup
 #define RED_PIN   6
 #define GREEN_PIN 9
@@ -25,14 +24,8 @@ unsigned long buttonCheckMillis;
 #define COMMON_CATHODE 1
 
 
-// #define Led_TYPE Led::COMMON_ANODE
-// RGBLed rgbLed(RED_PIN, GREEN_PIN, BLUE_PIN, rgbLed_TYPE);
-// Led rgbLed(RED_PIN, GREEN_PIN, BLUE_PIN, Led_TYPE);
 Led rgbLed(RED_PIN, GREEN_PIN, BLUE_PIN, static_cast<LedType>(COMMON_ANODE));
 
-
-// create variable named brightnes
-// float brightness;
 
 // void updateLed() {
 
@@ -173,7 +166,6 @@ void setup()
   }
   RawHID.begin(rawhidData, sizeof(rawhidData));
 
-  // brightness = 0;
   rgbLed.off();
 }
 
@@ -230,4 +222,9 @@ void loop()
     }
   }
   // rgbLed.setColor({255,0,0});
+  // rgbLed.on(Led::MAGENTA);
+  rgbLed.on(255,0,255);
+  delay(1000);
+  rgbLed.off();
+  delay(1000);
 }
