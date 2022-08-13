@@ -10,14 +10,17 @@ class Led {
     private:
         int m_redPin, m_greenPin, m_bluePin;
         float m_brightness;
-        LedType m_ledType;
+        LedType m_ledType;   
+        unsigned long m_lastUpdate;     
 
     public:
         Led(byte pin_red, byte pin_green, byte pin_blue, LedType led_type);
+        void on();
         void on(int color[3]);
         void on(int red, int green, int blue);
         void off();
-        void breath(byte speed);
+        // void breath(int speed);
+        void blink(int onTime, int offTime);
         static int RED[3];
         static int GREEN[3];
         static int BLUE[3];

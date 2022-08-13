@@ -15,7 +15,54 @@ Led::Led(byte pin_red, byte pin_green, byte pin_blue, LedType led_type) {
         m_redPin = pin_red;
         m_greenPin = pin_green;
         m_bluePin = pin_blue;
-        m_brightness = 255;
+        if (led_type == 0) {
+            m_brightness = 0; // common_anode LOW = max brightness
+        } else {
+            m_brightness = 255; // common_cathod HIGH = max brightness
+        }
+        m_lastUpdate = millis();
+}
+
+void Led::blink(int onTime, int offTime) {
+    #ifdef DEBUG
+    Serial.print("Led::blink(");
+    Serial.print(onTime);
+    Serial.print(", ");
+    Serial.print(offTime);
+    Serial.println(")");
+    Serial.print("m_lastUpdate = ");
+    Serial.print(m_lastUpdate);
+    Serial.print("; millis() = ");
+    Serial.println(millis());
+    #endif
+    if (millis() - m_lastUpdate < onTime) {
+        on();
+    } else if (millis() - m_lastUpdate < onTime + offTime) {
+        off();
+    } else {
+        m_lastUpdate = millis();
+    }
+}
+// void Led::breath(int speed) {
+
+//     if (m_lastUpdate + 1 < millis()) {
+//         float val = (exp(sin(millis()/speed * PI)) - 0.368) * 108.0;
+//         analogWrite(m_redPin, val);
+//         m_lastUpdate = millis();
+//     }
+
+// }
+
+void Led::on() {
+    if (m_ledType == 0) {
+        analogWrite(m_redPin, 0);
+        analogWrite(m_greenPin, 0);
+        analogWrite(m_bluePin, 0);
+    } else {
+        analogWrite(m_redPin, 255-0);
+        analogWrite(m_greenPin, 255-0);
+        analogWrite(m_bluePin, 255-0);
+    }
 }
 void Led::on(int color[3]) {
      if (m_ledType == 0) {
@@ -42,12 +89,12 @@ void Led::on(int red, int green, int blue) {
     }
 }
 void Led::off() {
-    // 0 = common_anode
-    if (m_ledType == 0) {
+    if (m_ledType == 0) {           // 0 = common_anode
         analogWrite(m_redPin, 255-0);
         analogWrite(m_greenPin, 255-0);
         analogWrite(m_bluePin, 255-0);
-    } else {
+    } 
+    else {                          // 1 = common_cathode
         analogWrite(m_redPin, 0);
         analogWrite(m_greenPin, 0);
         analogWrite(m_bluePin, 0);

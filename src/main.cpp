@@ -221,10 +221,12 @@ void loop()
       // https://github.com/spuder/MuteMe-arduino/issues/1
     }
   }
-  // rgbLed.setColor({255,0,0});
-  // rgbLed.on(Led::MAGENTA);
-  rgbLed.on(255,0,255);
-  delay(1000);
-  rgbLed.off();
-  delay(1000);
+  // rgbLed.breath(1200);
+  rgbLed.blink(500, 800);
+  // rgbLed.update();
+  // rgbLed.on();
+  // delay(400);
+  // rgbLed.off();
+  // delay(400);
+
 }
