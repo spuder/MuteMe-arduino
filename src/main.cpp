@@ -19,6 +19,8 @@ unsigned long buttonCheckMillis;
 #define GREEN_PIN 9
 #define BLUE_PIN  10
 
+// TODO: what is proper way to configure a enum with a macro
+// https://stackoverflow.com/a/238157/1626687
 #define COMMON_ANODE 0
 #define COMMON_CATHODE 1
 
@@ -26,7 +28,7 @@ unsigned long buttonCheckMillis;
 // #define Led_TYPE Led::COMMON_ANODE
 // RGBLed rgbLed(RED_PIN, GREEN_PIN, BLUE_PIN, rgbLed_TYPE);
 // Led rgbLed(RED_PIN, GREEN_PIN, BLUE_PIN, Led_TYPE);
-Led rgbLed(RED_PIN, GREEN_PIN, BLUE_PIN, 1);
+Led rgbLed(RED_PIN, GREEN_PIN, BLUE_PIN, static_cast<LedType>(COMMON_ANODE));
 
 
 // create variable named brightnes
