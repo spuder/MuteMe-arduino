@@ -27,7 +27,6 @@ void Led::update() {
             break;
         case LedEffect::slow_pulse:
             pulse(1200);
-
             break;
     }
 }
@@ -41,16 +40,39 @@ void Led::setColor(LedColor color) {
 }
 
 void Led::pulse(int period) {
-    
+    if((last_refresh_time + 1) < millis() ){
+        last_refresh_time = millis();
+        // https://thingpulse.com/breathing-leds-cracking-the-algorithm-behind-our-breathing-pattern/
+        // https://github.com/ThingPulse/esp32-icon64-a2dp/blob/master/src/main.cpp#L176-L211
+        float min =  0.381966011;
+        float amplitude = 49.0; //42.54590641;
+        uint8_t b = (exp(sin(millis()/(float)period*PI)) - min)* amplitude;
+        this->brightness = constrain((byte)b * 255 / 100, x, 255);
+        Serial.print(0);
+        Serial.print(" ");
+        Serial.print(255);
+        Serial.print(" ");
+        Serial.print(127);
+        Serial.print(" ");
+        Serial.println(255 - this->brightness);
+
+        byte red_brightness = (mapRed(this->color) * this->brightness) / 100;
+        byte green_brightness = (mapGreen(this->color) * this->brightness) / 100;
+        byte blue_brightness = (mapBlue(this->color) * this->brightness) / 100;
+
+        invertAnalogWrite(this->red_pin, red_brightness);
+        invertAnalogWrite(this->green_pin, green_brightness);
+        invertAnalogWrite(this->blue_pin, blue_brightness);
+    }
 }
 
 void Led::blink(int period) {
     if (millis() - last_refresh_time > period ){
         this->brightness = 100;
 
-        byte red_brightness = mapRed(this->color) * this->brightness / 100;
-        byte green_brightness = mapGreen(this->color) * this->brightness / 100;
-        byte blue_brightness = mapBlue(this->color) * this->brightness / 100;
+        byte red_brightness = (mapRed(this->color) * this->brightness) / 100;
+        byte green_brightness = (mapGreen(this->color) * this->brightness) / 100;
+        byte blue_brightness = (mapBlue(this->color) * this->brightness) / 100;
 
         invertAnalogWrite(this->red_pin, red_brightness);
         invertAnalogWrite(this->green_pin, green_brightness);
@@ -130,7 +152,7 @@ byte Led::mapBlue(LedColor color) {
         case LedColor::blue:
             return 255;
         case LedColor::yellow:
-            return 255;
+            return 0;
         case LedColor::purple:
             return 255;
         case LedColor::cyan:
@@ -141,5 +163,3 @@ byte Led::mapBlue(LedColor color) {
             return 0;
     }
 }
-
-

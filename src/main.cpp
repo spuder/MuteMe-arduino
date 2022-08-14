@@ -14,14 +14,13 @@ unsigned long timer = 0;
 void setup()
 {
     timer = millis();
-    Led.setColor(LedColor::green);
-    Led.setEffect(LedEffect::fast_pulse);
-    Serial.begin(9600);
+    Led.setColor(LedColor::purple);
+    Led.setEffect(LedEffect::slow_pulse);
+    Serial.begin(115200);
 }
 
 void loop()
 {
     Led.update();
 }
-
 
