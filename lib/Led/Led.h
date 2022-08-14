@@ -22,14 +22,17 @@ enum LedColor {
 
 class Led {
     private:
-        int red_pin, green_pin, blue_pin;
         LedColor color;
         LedEffect effect;
         byte brightness;
+        int red_pin, green_pin, blue_pin;
         unsigned long oldMillis;
-        void pulse(int period);
-        void bright();
         unsigned long last_refresh_time;
+
+        void pulse(int period);
+        void blink(int period);
+        void bright();
+
         void invertAnalogWrite(int pin, int value);
         byte mapRed(LedColor color);
         byte mapGreen(LedColor color);

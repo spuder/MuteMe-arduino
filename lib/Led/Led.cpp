@@ -26,6 +26,8 @@ void Led::update() {
             pulse(600);
             break;
         case LedEffect::slow_pulse:
+            pulse(1200);
+
             break;
     }
 }
@@ -39,6 +41,10 @@ void Led::setColor(LedColor color) {
 }
 
 void Led::pulse(int period) {
+    
+}
+
+void Led::blink(int period) {
     if (millis() - last_refresh_time > period ){
         this->brightness = 100;
 
