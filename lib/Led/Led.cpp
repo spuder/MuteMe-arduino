@@ -15,11 +15,11 @@ Led::Led(byte red_pin, byte green_pin, byte blue_pin) {
 void Led::update() {
     switch (this->effect) {
         case LedEffect::bright:
-            this->brightness = 0;
+            this->brightness = 255;
             bright();
             break;
         case LedEffect::dim:
-            this->brightness = 170;
+            this->brightness = 50;
             bright();
             break;
         case LedEffect::fast_pulse:
@@ -44,14 +44,14 @@ void Led::pulse(int period) {
         this->brightness = 255;
 
         float percent = (float)this->brightness / 255;
-        Serial.print(percent);
-        Serial.print("% ");
-        Serial.print(colors[0] * percent);
-        Serial.print(",");
-        Serial.print(colors[1] * percent);
-        Serial.print(",");
-        Serial.print(colors[2] * percent);
-        Serial.println("");
+        // Serial.print(percent);
+        // Serial.print("% ");
+        // Serial.print(colors[0] * percent);
+        // Serial.print(",");
+        // Serial.print(colors[1] * percent);
+        // Serial.print(",");
+        // Serial.print(colors[2] * percent);
+        // Serial.println("");
         invertAnalogWrite(this->red_pin, colors[0] * percent);
         invertAnalogWrite(this->green_pin, colors[1] * percent);
         invertAnalogWrite(this->blue_pin, colors[2] * percent);
@@ -59,14 +59,14 @@ void Led::pulse(int period) {
     if (millis() - last_refresh_time > period*2) {
         this->brightness = 70;
         float percent = (float)this->brightness / 255;
-        Serial.print(percent);
-        Serial.print("% ");
-        Serial.print(colors[0] * percent);
-        Serial.print(",");
-        Serial.print(colors[1] * percent);
-        Serial.print(",");
-        Serial.print(colors[2] * percent);
-        Serial.println("");
+        // Serial.print(percent);
+        // Serial.print("% ");
+        // Serial.print(colors[0] * percent);
+        // Serial.print(",");
+        // Serial.print(colors[1] * percent);
+        // Serial.print(",");
+        // Serial.print(colors[2] * percent);
+        // Serial.println("");
         invertAnalogWrite(this->red_pin, colors[0] * percent);
         invertAnalogWrite(this->green_pin, colors[1] * percent);
         invertAnalogWrite(this->blue_pin, colors[2] * percent);
