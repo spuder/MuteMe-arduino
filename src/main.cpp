@@ -15,7 +15,7 @@ unsigned long timer = 0;
 void setup()
 {
     timer = millis();
-    Led.setColor(LedColor::green);
+    Led.setColor(LedColor::red);
     Led.setEffect(LedEffect::fast_pulse);
     Serial.begin(9600);
 }
@@ -45,7 +45,6 @@ void loop()
     // analogWrite(6, 0);
     // delay(1000);
     // Led.setColor(LedColor::green);
-    delay(10);
     Led.update();
 }
 
