@@ -19,7 +19,7 @@ void Led::update() {
             bright();
             break;
         case LedEffect::dim:
-            this->brightness = 50;
+            this->brightness = 0;
             bright();
             break;
         case LedEffect::fast_pulse:
@@ -39,37 +39,37 @@ void Led::setColor(LedColor color) {
 }
 
 void Led::pulse(int period) {
-    byte* colors = convertColor(this->color);
+    // byte colors[3] = convertColor(this->color);
     if (millis() - last_refresh_time > period ){
         this->brightness = 100;
-        invertAnalogWrite(this->red_pin, colors[0] * this->brightness / 100);
-        invertAnalogWrite(this->green_pin, colors[1] * this->brightness / 100);
-        invertAnalogWrite(this->blue_pin, colors[2] * this->brightness / 100);
+        invertAnalogWrite(this->red_pin, mapRed(this->color) * this->brightness / 100);
+        invertAnalogWrite(this->green_pin, mapGreen(this->color) * this->brightness / 100);
+        invertAnalogWrite(this->blue_pin, mapBlue(this->color) * this->brightness / 100);
     }
     if (millis() - last_refresh_time > period*2) {
         this->brightness = 50;
-        Serial.print(" colors[0] is: ");
-        Serial.print((int)colors[0]);
-        Serial.print(" colors[1] is: ");
-        Serial.print((int)colors[1]);
-        Serial.print(" colors[2] is: ");
-        Serial.print((int)colors[2]);
-        Serial.println();
+        // Serial.print(" colors[0] is: ");
+        // Serial.print((int)colors[0]);
+        // Serial.print(" colors[1] is: ");
+        // Serial.print((int)colors[1]);
+        // Serial.print(" colors[2] is: ");
+        // Serial.print((int)colors[2]);
+        // Serial.println();
 
-        byte red_brightness = colors[0] * this->brightness / 100;
-        byte green_brightness = colors[1] * this->brightness / 100;
-        byte blue_brightness = colors[2] * this->brightness / 100;
+        byte red_brightness = mapRed(this->color) * this->brightness / 100;
+        byte green_brightness = mapGreen(this->color) * this->brightness / 100;
+        byte blue_brightness = mapBlue(this->color) * this->brightness / 100;
 
         invertAnalogWrite(this->red_pin, red_brightness);
         invertAnalogWrite(this->green_pin, green_brightness);
         invertAnalogWrite(this->blue_pin, blue_brightness);
 
-        Serial.print("red_brightness is: ");
-        Serial.print(red_brightness);
-        Serial.print(" green_brightness is: ");
-        Serial.print(green_brightness);
-        Serial.print(" blue_brightness is: ");
-        Serial.println(blue_brightness);
+        // Serial.print("red_brightness is: ");
+        // Serial.print(red_brightness);
+        // Serial.print(" green_brightness is: ");
+        // Serial.print(green_brightness);
+        // Serial.print(" blue_brightness is: ");
+        // Serial.println(blue_brightness);
 
         Serial.println();
         last_refresh_time = millis();
@@ -93,7 +93,71 @@ void Led::bright() {
 }
 
 
-byte* Led::convertColor(LedColor color) {
+byte Led::mapRed(LedColor color) {
+    switch (color) {
+        case LedColor::red:
+            return 255;
+        case LedColor::green:
+            return 0;
+        case LedColor::blue:
+            return 0;
+        case LedColor::yellow:
+            return 255;
+        case LedColor::purple:
+            return 255;
+        case LedColor::cyan:
+            return 0;
+        case LedColor::white:
+            return 255;
+        default:
+            return 0;
+    }
+}
+
+byte Led::mapGreen(LedColor color) {
+    switch (color) {
+        case LedColor::red:
+            return 0;
+        case LedColor::green:
+            return 255;
+        case LedColor::blue:
+            return 0;
+        case LedColor::yellow:
+            return 255;
+        case LedColor::purple:
+            return 0;
+        case LedColor::cyan:
+            return 255;
+        case LedColor::white:
+            return 255;
+        default:
+            return 0;
+    }
+}
+
+byte Led::mapBlue(LedColor color) {
+    switch (color) {
+        case LedColor::red:
+            return 0;
+        case LedColor::green:
+            return 0;
+        case LedColor::blue:
+            return 255;
+        case LedColor::yellow:
+            return 255;
+        case LedColor::purple:
+            return 255;
+        case LedColor::cyan:
+            return 255;
+        case LedColor::white:
+            return 255;
+        default:
+            return 0;
+    }
+}
+
+
+byte Led::convertColor(LedColor color) {
     // create a byte array of length 3
     byte color_array[3];
     switch (color) {
