@@ -41,7 +41,7 @@ void Led::setColor(LedColor color) {
 void Led::pulse(int period) {
     unsigned char* colors = convertColor(this->color);
     if (millis() - last_refresh_time > period ){
-        this->brightness = 0;
+        this->brightness = 255;
 
         float percent = (float)this->brightness / 255;
         Serial.print(percent);
@@ -57,7 +57,7 @@ void Led::pulse(int period) {
         invertAnalogWrite(this->blue_pin, colors[2] * percent);
     }
     if (millis() - last_refresh_time > period*2) {
-        this->brightness = 150;
+        this->brightness = 70;
         float percent = (float)this->brightness / 255;
         Serial.print(percent);
         Serial.print("% ");
@@ -79,17 +79,17 @@ void Led::invertAnalogWrite(int pin, int value) {
 }
 
 void Led::bright() {
-    Serial.println("running bright");
-    Serial.print("brightness is: ");
-    Serial.println(this->brightness);
-    Serial.println("red pin is: ");
-    Serial.println(this->red_pin);
+    // Serial.println("running bright");
+    // Serial.print("brightness is: ");
+    // Serial.println(this->brightness);
+    // Serial.println("red pin is: ");
+    // Serial.println(this->red_pin);
     invertAnalogWrite(this->red_pin, this->brightness);
 }
 
 // function named convertColor to takes 1 parameter of type LedColor and returns a byte arra of length 3
-char* Led::convertColor(LedColor color) {
-    unsigned char* color_array = new char[3];
+unsigned char* Led::convertColor(LedColor color) {
+    unsigned char* color_array = new unsigned char[3];
     switch (color) {
         case LedColor::no_color:
             color_array[0] = 0;

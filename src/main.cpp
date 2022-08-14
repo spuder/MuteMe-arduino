@@ -15,7 +15,7 @@ unsigned long timer = 0;
 void setup()
 {
     timer = millis();
-    Led.setColor(LedColor::blue);
+    Led.setColor(LedColor::red);
     Led.setEffect(LedEffect::fast_pulse);
     Serial.begin(9600);
 
