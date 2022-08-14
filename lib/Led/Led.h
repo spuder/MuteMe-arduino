@@ -26,18 +26,14 @@ class Led {
         LedColor color;
         LedEffect effect;
         byte brightness;
-        byte max_brightness;
         unsigned long oldMillis;
         void pulse(int period);
-        void display(LedColor color, LedEffect effect);
         void bright();
         unsigned long last_refresh_time;
-        unsigned char convertColor(LedColor color);
         void invertAnalogWrite(int pin, int value);
         byte mapRed(LedColor color);
         byte mapGreen(LedColor color);
         byte mapBlue(LedColor color);
-        // TODO: validate brightness is between 0 and 100
     public:
         Led(byte red_pin, byte green_pin, byte blue_pin);
         void update();

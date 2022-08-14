@@ -51,7 +51,7 @@ void Led::pulse(int period) {
         invertAnalogWrite(this->blue_pin, blue_brightness);
     }
     if (millis() - last_refresh_time > period*2) {
-        this->brightness = 50;
+        this->brightness = 25;
 
         byte red_brightness = mapRed(this->color) * this->brightness / 100;
         byte green_brightness = mapGreen(this->color) * this->brightness / 100;
