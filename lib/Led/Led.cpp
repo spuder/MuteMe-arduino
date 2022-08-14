@@ -15,7 +15,7 @@ Led::Led(byte red_pin, byte green_pin, byte blue_pin) {
 void Led::update() {
     switch (this->effect) {
         case LedEffect::bright:
-            this->brightness = this->max_brightness;
+            this->brightness = 0;
             bright();
             break;
         case LedEffect::dim:
@@ -23,11 +23,9 @@ void Led::update() {
             bright();
             break;
         case LedEffect::fast_pulse:
-            // this->pulse(this->color, 600);
             pulse(600);
             break;
         case LedEffect::slow_pulse:
-            // this->pulse(this->color, 1200 );
             break;
     }
 }
@@ -41,23 +39,43 @@ void Led::setColor(LedColor color) {
 }
 
 void Led::pulse(int period) {
-    // unsigned long currentMillis = millis();
-    auto colors = convertColor(this->color);
+    unsigned char* colors = convertColor(this->color);
     if (millis() - last_refresh_time > period ){
         this->brightness = 0;
-        auto colors = convertColor(this->color);
-        analogWrite(this->red_pin, colors[0] + this->brightness);
-        analogWrite(this->green_pin, colors[1] + this->brightness);
-        analogWrite(this->blue_pin, colors[2] + this->brightness);
 
+        float percent = (float)this->brightness / 255;
+        Serial.print(percent);
+        Serial.print("% ");
+        Serial.print(colors[0] * percent);
+        Serial.print(",");
+        Serial.print(colors[1] * percent);
+        Serial.print(",");
+        Serial.print(colors[2] * percent);
+        Serial.println("");
+        invertAnalogWrite(this->red_pin, colors[0] * percent);
+        invertAnalogWrite(this->green_pin, colors[1] * percent);
+        invertAnalogWrite(this->blue_pin, colors[2] * percent);
     }
     if (millis() - last_refresh_time > period*2) {
-        this->brightness = 255;
-        analogWrite(this->red_pin, colors[0] + this->brightness);
-        analogWrite(this->green_pin, colors[1] + this->brightness);
-        analogWrite(this->blue_pin, colors[2] + this->brightness);
+        this->brightness = 150;
+        float percent = (float)this->brightness / 255;
+        Serial.print(percent);
+        Serial.print("% ");
+        Serial.print(colors[0] * percent);
+        Serial.print(",");
+        Serial.print(colors[1] * percent);
+        Serial.print(",");
+        Serial.print(colors[2] * percent);
+        Serial.println("");
+        invertAnalogWrite(this->red_pin, colors[0] * percent);
+        invertAnalogWrite(this->green_pin, colors[1] * percent);
+        invertAnalogWrite(this->blue_pin, colors[2] * percent);
         last_refresh_time += 1000;
     }
+}
+
+void Led::invertAnalogWrite(int pin, int value) {
+    analogWrite(pin, 255 - value);
 }
 
 void Led::bright() {
@@ -66,12 +84,12 @@ void Led::bright() {
     Serial.println(this->brightness);
     Serial.println("red pin is: ");
     Serial.println(this->red_pin);
-    analogWrite(this->red_pin, this->brightness);
+    invertAnalogWrite(this->red_pin, this->brightness);
 }
 
 // function named convertColor to takes 1 parameter of type LedColor and returns a byte arra of length 3
 char* Led::convertColor(LedColor color) {
-    byte* color_array = new byte[3];
+    unsigned char* color_array = new char[3];
     switch (color) {
         case LedColor::no_color:
             color_array[0] = 0;

@@ -33,6 +33,7 @@ class Led {
         void bright();
         unsigned long last_refresh_time;
         char* convertColor(LedColor color);
+        void invertAnalogWrite(int pin, int value);
     public:
         Led(byte red_pin, byte green_pin, byte blue_pin);
         void update();
