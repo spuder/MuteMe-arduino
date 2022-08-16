@@ -7,47 +7,85 @@ Led::Led(byte red_pin, byte green_pin, byte blue_pin) {
     this->blue_pin = blue_pin;
     this->effect = LedEffect::bright;
     this->color = LedColor::no_color;
-    this->oldMillis = millis();
     this->brightness = 0; 
     this->last_refresh_time = 0;
 }
 
+/* 
+    Led::update() is the state machine that manages the LED state
+    These states are sent from the MuteMe software
+*/
 void Led::update() {
     switch (this->effect) {
         case LedEffect::bright:
             this->brightness = 100;
-            bright();
+            shine();
             break;
         case LedEffect::dim:
             this->brightness = 0;
-            bright();
+            shine();
             break;
         case LedEffect::fast_pulse:
-            pulse(600);
+            pulse(600); // 600 milliseconds = 1 second for 1/2 phase transition
             break;
         case LedEffect::slow_pulse:
-            pulse(1200);
+            pulse(1200); // 1200 milliseconds = 1 second for 1/2 phase transition
             break;
     }
 }
 
+/*
+    Led::setEffect is a public function to set the led lighting effect
+    https://muteme.com/pages/muteme-hid-key
+    0x10 - 0x1F = constant dim
+    0x20 - 0x2F = fast pulse
+    0x30 - 0x3F = slow pulse
+*/
 void Led::setEffect(LedEffect effect) {
     this->effect = effect;
 }
 
+/*
+    Led::setColor is a public function to set the led lighting color
+    https://muteme.com/pages/muteme-hid-key
+    0x01 = red
+    0x02 = green
+    0x03 = yellow
+    0x04 = blue
+    0x05 = purple
+    0x06 = cyan
+    0x07 = white
+    0x00 0x00 = no color
+*/
 void Led::setColor(LedColor color) {
     this->color = color;
 }
 
+/*
+    Led::pulse is the fading or breathing animation
+    It uses a gausian function to fade the LED from 0 to 255
+    Facinating article about the math here: 
+    https://makersportal.com/blog/2020/3/27/simple-breathing-led-in-arduino
+    https://thingpulse.com/breathing-leds-cracking-the-algorithm-behind-our-breathing-pattern/
+*/
 void Led::pulse(int period) {
     if((last_refresh_time + 1) < millis() ){
         last_refresh_time = millis();
-        // https://thingpulse.com/breathing-leds-cracking-the-algorithm-behind-our-breathing-pattern/
         // https://github.com/ThingPulse/esp32-icon64-a2dp/blob/master/src/main.cpp#L176-L211
-        float min =  0.381966011;
-        float amplitude = 49.0; //42.54590641;
-        uint8_t b = (exp(sin(millis()/(float)period*PI)) - min)* amplitude;
-        this->brightness = constrain((byte)b * 255 / 100, x, 255);
+        // float min =  0.381966011;
+        // float amplitude = 49.0; //42.54590641;
+        uint8_t b = (exp(sin(millis()/(float)period*PI)) - 0.36787944)* 108.0;
+        if (b > 100) {
+            b = 100;
+            Serial.print("oh no got an invalid brightness!!!!!!!!!!");
+            Serial.println(b);
+        }
+        if (b < 0) {
+            b = 0;
+            Serial.print("oh no got an invalid brightness!!!!!!!!!!");
+            Serial.println(b);
+        }
+        this->brightness = constrain((byte)b * 255 / 100, 0, 255);
         Serial.print(0);
         Serial.print(" ");
         Serial.print(255);
@@ -66,6 +104,10 @@ void Led::pulse(int period) {
     }
 }
 
+/*
+    Led::blink is not used it is simply left here as an option for debugging purposes
+    It transitions an LED between 100% and 0% brightness every x number of milliseconds (period)
+*/
 void Led::blink(int period) {
     if (millis() - last_refresh_time > period ){
         this->brightness = 100;
@@ -92,15 +134,31 @@ void Led::blink(int period) {
     }
 }
 
-
+/*
+    Common Cathode LEDS turn 'on' when grounded (e.g. 0v or LOW)
+    However the traditional RGB values are 0-255 where 255 = 100% brightness
+    Compensate by inverting the RGB values from 0-255 to 255-0
+*/
 void Led::invertAnalogWrite(int pin, int value) {
     analogWrite(pin, 255 - value);
 }
 
-void Led::bright() {
+/*
+    Led::shine is a normal 'on' or 'dimmed' state
+*/
+void Led::shine() {
     invertAnalogWrite(this->red_pin, this->brightness);
+    invertAnalogWrite(this->green_pin, this->green_brightness);
+    invertAnalogWrite(this->blue_pin, this->blue_brightness);
 }
 
+/*
+    Led::mapRed returns the red value of the RGB value of the LED
+    [ 255, 0, 0 ] = red
+    [ 0, 255, 0 ] = green
+    [ 0, 0, 255 ] = blue
+    ect...
+*/
 byte Led::mapRed(LedColor color) {
     switch (color) {
         case LedColor::red:
@@ -122,6 +180,13 @@ byte Led::mapRed(LedColor color) {
     }
 }
 
+/*
+    Led::mapGreen returns the green value of the RGB value of the LED
+    [ 255, 0, 0 ] = red
+    [ 0, 255, 0 ] = green
+    [ 0, 0, 255 ] = blue
+    ect...
+*/
 byte Led::mapGreen(LedColor color) {
     switch (color) {
         case LedColor::red:
@@ -143,6 +208,13 @@ byte Led::mapGreen(LedColor color) {
     }
 }
 
+/*
+    Led::mapBlue returns the blue value of the RGB value of the LED
+    [ 255, 0, 0 ] = red
+    [ 0, 255, 0 ] = green
+    [ 0, 0, 255 ] = blue
+    ect...
+*/
 byte Led::mapBlue(LedColor color) {
     switch (color) {
         case LedColor::red:

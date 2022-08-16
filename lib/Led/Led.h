@@ -31,7 +31,7 @@ class Led {
 
         void pulse(int period);
         void blink(int period);
-        void bright();
+        void shine();
 
         void invertAnalogWrite(int pin, int value);
         byte mapRed(LedColor color);
