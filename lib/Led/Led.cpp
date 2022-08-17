@@ -29,7 +29,7 @@ void Led::update() {
             pulse(600); // 600 milliseconds = 1 second for 1/2 phase transition
             break;
         case LedEffect::slow_pulse:
-            pulse(1200); // 1200 milliseconds = 1 second for 1/2 phase transition
+            pulse(1205); // 1200 milliseconds = 1 second for 1/2 phase transition
             break;
     }
 }
@@ -71,20 +71,12 @@ void Led::setColor(LedColor color) {
 void Led::pulse(int period) {
     if((last_refresh_time + 1) < millis() ){
         last_refresh_time = millis();
-        // https://github.com/ThingPulse/esp32-icon64-a2dp/blob/master/src/main.cpp#L176-L211
-        // float min =  0.381966011;
-        // float amplitude = 49.0; //42.54590641;
-
-        // f(x) = (esin(x) - 1/e) * (100/(e - 1/e)).
-        float time = millis() / 2000.0 * 3.1415926535897932384626433832795; 
         float e = 2.7182818284590452353602874713526624977572470936999595749669676277;
-        // float amplitude = 108.49206135051349700456495231911484873316989426606830116627869684; //255/(e - 1/e);
-        // float amplitude = 42.546;
-        float amplitude = 85.09;
-
-        // float b = (exp(sin(millis()/2553.19149 * PI)) - 0.36787944)* amplitude;
-
-        float b = (exp(sin(millis()/2000.0 * PI)) - 0.368) * 108.0;
+        // min_brightness + max_brightness should equal 255
+        byte min_brightness = 35;           // 0 = all the way off, 255 = all the way on
+        byte max_brightness = 220;          // 0 = all the way off, 255 = all the way on
+        float amplitude = max_brightness / (e - 1/e); //255(e - 1/e); would be 108.0
+        float b = (exp(sin(millis()/(float)period * PI )) - 1/(e+ min_brightness)) * amplitude;
         this->brightness = (byte)b;
 
         byte red_brightness = (mapRed(this->color) * this->brightness) / 255;
