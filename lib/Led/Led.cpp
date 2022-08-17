@@ -68,7 +68,7 @@ void Led::setColor(LedColor color) {
     https://makersportal.com/blog/2020/3/27/simple-breathing-led-in-arduino
     https://thingpulse.com/breathing-leds-cracking-the-algorithm-behind-our-breathing-pattern/
 */
-void Led::pulse(int period) {
+void Led::pulse(unsigned int period) {
     if((last_refresh_time + 1) < millis() ){
         last_refresh_time = millis();
         float e = 2.7182818284590452353602874713526624977572470936999595749669676277;
@@ -93,7 +93,7 @@ void Led::pulse(int period) {
     Led::blink is not used it is simply left here as an option for debugging purposes
     It transitions an LED between 100% and 0% brightness every x number of milliseconds (period)
 */
-void Led::blink(int period) {
+void Led::blink(unsigned int period) {
     if (millis() - last_refresh_time > period ){
         this->brightness = 100;
         byte red_brightness = (mapRed(this->color) * this->brightness) / 255;

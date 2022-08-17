@@ -26,11 +26,10 @@ class Led {
         LedEffect effect;
         byte brightness;
         int red_pin, green_pin, blue_pin;
-        unsigned long oldMillis;
         unsigned long last_refresh_time;
 
-        void pulse(int period);
-        void blink(int period);
+        void pulse(unsigned int period);
+        void blink(unsigned int period);
         void shine();
 
         void invertAnalogWrite(int pin, int value);
