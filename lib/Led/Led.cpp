@@ -29,7 +29,7 @@ void Led::update() {
             pulse(600); // 600 milliseconds = 1 second for 1/2 phase transition
             break;
         case LedEffect::slow_pulse:
-            pulse(1205); // 1200 milliseconds = 1 second for 1/2 phase transition
+            pulse(1200); // 1200 milliseconds = 1 second for 1/2 phase transition
             break;
     }
 }
