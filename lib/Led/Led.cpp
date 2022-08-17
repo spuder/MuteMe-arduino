@@ -74,29 +74,22 @@ void Led::pulse(int period) {
         // https://github.com/ThingPulse/esp32-icon64-a2dp/blob/master/src/main.cpp#L176-L211
         // float min =  0.381966011;
         // float amplitude = 49.0; //42.54590641;
-        uint8_t b = (exp(sin(millis()/(float)period*PI)) - 0.36787944)* 108.0;
-        if (b > 100) {
-            b = 100;
-            Serial.print("oh no got an invalid brightness!!!!!!!!!!");
-            Serial.println(b);
-        }
-        if (b < 0) {
-            b = 0;
-            Serial.print("oh no got an invalid brightness!!!!!!!!!!");
-            Serial.println(b);
-        }
-        this->brightness = constrain((byte)b * 255 / 100, 0, 255);
-        Serial.print(0);
-        Serial.print(" ");
-        Serial.print(255);
-        Serial.print(" ");
-        Serial.print(127);
-        Serial.print(" ");
-        Serial.println(255 - this->brightness);
 
-        byte red_brightness = (mapRed(this->color) * this->brightness) / 100;
-        byte green_brightness = (mapGreen(this->color) * this->brightness) / 100;
-        byte blue_brightness = (mapBlue(this->color) * this->brightness) / 100;
+        // f(x) = (esin(x) - 1/e) * (100/(e - 1/e)).
+        float time = millis() / 2000.0 * 3.1415926535897932384626433832795; 
+        float e = 2.7182818284590452353602874713526624977572470936999595749669676277;
+        // float amplitude = 108.49206135051349700456495231911484873316989426606830116627869684; //255/(e - 1/e);
+        // float amplitude = 42.546;
+        float amplitude = 85.09;
+
+        // float b = (exp(sin(millis()/2553.19149 * PI)) - 0.36787944)* amplitude;
+
+        float b = (exp(sin(millis()/2000.0 * PI)) - 0.368) * 108.0;
+        this->brightness = (byte)b;
+
+        byte red_brightness = (mapRed(this->color) * this->brightness) / 255;
+        byte green_brightness = (mapGreen(this->color) * this->brightness) / 255;
+        byte blue_brightness = (mapBlue(this->color) * this->brightness) / 255;
 
         invertAnalogWrite(this->red_pin, red_brightness);
         invertAnalogWrite(this->green_pin, green_brightness);
@@ -111,22 +104,18 @@ void Led::pulse(int period) {
 void Led::blink(int period) {
     if (millis() - last_refresh_time > period ){
         this->brightness = 100;
-
-        byte red_brightness = (mapRed(this->color) * this->brightness) / 100;
-        byte green_brightness = (mapGreen(this->color) * this->brightness) / 100;
-        byte blue_brightness = (mapBlue(this->color) * this->brightness) / 100;
-
+        byte red_brightness = (mapRed(this->color) * this->brightness) / 255;
+        byte green_brightness = (mapGreen(this->color) * this->brightness) / 255;
+        byte blue_brightness = (mapBlue(this->color) * this->brightness) / 255;
         invertAnalogWrite(this->red_pin, red_brightness);
         invertAnalogWrite(this->green_pin, green_brightness);
         invertAnalogWrite(this->blue_pin, blue_brightness);
     }
     if (millis() - last_refresh_time > period*2) {
         this->brightness = 25;
-
-        byte red_brightness = mapRed(this->color) * this->brightness / 100;
-        byte green_brightness = mapGreen(this->color) * this->brightness / 100;
-        byte blue_brightness = mapBlue(this->color) * this->brightness / 100;
-
+        byte red_brightness = mapRed(this->color) * this->brightness / 255;
+        byte green_brightness = mapGreen(this->color) * this->brightness / 255;
+        byte blue_brightness = mapBlue(this->color) * this->brightness / 255;
         invertAnalogWrite(this->red_pin, red_brightness);
         invertAnalogWrite(this->green_pin, green_brightness);
         invertAnalogWrite(this->blue_pin, blue_brightness);
@@ -141,15 +130,17 @@ void Led::blink(int period) {
 */
 void Led::invertAnalogWrite(int pin, int value) {
     analogWrite(pin, 255 - value);
+    // Serial.println(value);
+    // analogWrite(pin, value);
 }
 
 /*
     Led::shine is a normal 'on' or 'dimmed' state
 */
 void Led::shine() {
-    invertAnalogWrite(this->red_pin, this->brightness);
-    invertAnalogWrite(this->green_pin, this->green_brightness);
-    invertAnalogWrite(this->blue_pin, this->blue_brightness);
+    invertAnalogWrite(this->red_pin, mapRed(this->color) * this->brightness);
+    invertAnalogWrite(this->green_pin, mapGreen(this->color) * this->brightness);
+    invertAnalogWrite(this->blue_pin, mapBlue(this->color) * this->brightness);
 }
 
 /*
