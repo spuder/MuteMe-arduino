@@ -13,7 +13,7 @@
 
 Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
 Button2 button;
-uint8_t rawhidData[64];
+byte rawhidData[64];
 
 void pressed(Button2& btn) {
     rawhidData[3] = 0x04; // Touch Button
@@ -55,7 +55,7 @@ void setup()
     button.setReleasedHandler(released);
 
     // Workaround for bug when sending less than 64 bytes of data
-    for (auto i = 0; i < sizeof(rawhidData); i++)
+    for (byte i = 0; i < sizeof(rawhidData); i++)
     {
         rawhidData[i] = 0x00;
     }
