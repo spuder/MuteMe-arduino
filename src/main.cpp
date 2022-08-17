@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "Button2.h"
 #include "Led.h"
+#include "HID-Project.h"
 
 #define BUTTON_PIN 2
 #define RED_PIN    6
@@ -12,17 +13,21 @@
 
 Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
 Button2 button;
-
-unsigned long timer = 0;
-
+uint8_t rawhidData[64];
 
 void pressed(Button2& btn) {
+    rawhidData[3] = 0x04; // Touch Button
+    RawHID.write(rawhidData, sizeof(rawhidData));
+    rawhidData[3] = 0x00;
     #ifdef DEBUG
     Serial.println("pressed");
     #endif
 }
 
 void released(Button2& btn) {
+    rawhidData[3] = 0x02; // Release Button
+    RawHID.write(rawhidData, sizeof(rawhidData));
+    rawhidData[3] = 0x00;
     #ifdef DEBUG
     Serial.print("released: ");
     Serial.println(btn.wasPressedFor());
@@ -30,6 +35,9 @@ void released(Button2& btn) {
 }
 
 void longClickDetected(Button2& btn) {
+    rawhidData[3] = 0x01; // Hold Button
+    RawHID.write(rawhidData, sizeof(rawhidData));
+    rawhidData[3] = 0x00;
     #ifdef DEBUG
     Serial.println("long click detected\n");
     #endif 
@@ -38,7 +46,6 @@ void longClickDetected(Button2& btn) {
 
 void setup()
 {
-    timer = millis();
     Led.setColor(LedColor::blue);
     Led.setEffect(LedEffect::slow_pulse);
 
@@ -47,6 +54,13 @@ void setup()
     button.setLongClickDetectedHandler(longClickDetected);
     button.setReleasedHandler(released);
 
+    // Workaround for bug when sending less than 64 bytes of data
+    for (auto i = 0; i < sizeof(rawhidData); i++)
+    {
+        rawhidData[i] = 0x00;
+    }
+    RawHID.begin(rawhidData, sizeof(rawhidData));
+
     #ifdef DEBUG
     Serial.begin(115200);
     #endif
@@ -54,7 +68,7 @@ void setup()
 
 void loop()
 {
-    // Led.update();
+    Led.update();
     button.loop();
 
 }
