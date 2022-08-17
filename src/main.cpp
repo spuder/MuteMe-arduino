@@ -43,7 +43,6 @@ void longClickDetected(Button2& btn) {
     #endif 
 }
 
-
 void setup()
 {
     Led.setColor(LedColor::blue);
@@ -70,6 +69,5 @@ void loop()
 {
     Led.update();
     button.loop();
-
 }
 

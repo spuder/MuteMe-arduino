@@ -47,15 +47,17 @@ You can use a common cathode or common anode LED. If using a common cathod you w
 
 ```
 #define BUTTON_PIN 2
-#define BLUE_PIN	3
-#define GREEN_PIN	5
-#define RED_PIN	6
+#define RED_PIN	  6
+#define BLUE_PIN  10
+#define GREEN_PIN 9
 #define rgbLed_TYPE RGBLed::COMMON_ANODE
 ```
 
 Note: Pull up resistor on button is not required since Arduino Pro mini has internal pull up on pin 2
 
-![](https://imgur.com/jvcYaVM.png)
+![](https://imgur.com/g8jYZV3.png)
+
+(Fritzing file available in the [fritzing](./fritzing/) directory)
 
 ## Tech Specs
 
