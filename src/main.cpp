@@ -133,14 +133,11 @@ void loop()
     {
         while (bytesAvailable--)
         {
-            // TODO: use more appropriate data types
-            // TOOD: Why is 31 not valid data? 
-            // TODO: What is 71? 
             int hidData = RawHID.read();
             int ones = ((byte)hidData / 1)  % 16;
-            int tens = ((byte)hidData / 10) % 16;
+            int tens = ((byte)hidData / 16) % 16;
 
-            if ((ones >=0x00 && ones <= 0x07) && (tens >= 0x00 && tens <= 0x03) ) 
+            if ((ones >=0 && ones <= 7) && (tens >= 0 && tens <= 3) ) 
             {
                 #ifdef DEBUG
                 Serial.print("hidData: ");
@@ -168,7 +165,7 @@ void loop()
                 Serial.print(ones);
                 Serial.print(tens);
                 Serial.print("/");
-                Serial.println(hidData, HEX); //TODO: display as hex/byte
+                Serial.println(hidData, HEX);
                 #endif
             }
 
