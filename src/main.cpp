@@ -128,53 +128,49 @@ void loop()
 {
     Led.update();
     button.loop();
-    long bytesAvailable = RawHID.available();
+    int bytesAvailable = RawHID.available();
     if (bytesAvailable > 0)
     {
         while (bytesAvailable--)
         {
-            uint16_t hidData = RawHID.read();
-            uint16_t ones = ((byte)hidData / 1)  % 16;
-            uint16_t tens = ((byte)hidData / 10) % 16;
+            // TODO: use more appropriate data types
+            // TOOD: Why is 31 not valid data? 
+            // TODO: What is 71? 
+            int hidData = RawHID.read();
+            int ones = ((byte)hidData / 1)  % 16;
+            int tens = ((byte)hidData / 10) % 16;
 
-            if (ones >=0x00 && ones <= 0x07)
+            if ((ones >=0x00 && ones <= 0x07) && (tens >= 0x00 && tens <= 0x03) ) 
             {
-                if (tens >= 0x00 && tens <= 0x03)
-                {
-                    #ifdef DEBUG
-                    Serial.print("hidData: ");
-                    Serial.print(hidData, DEC);
-                    Serial.print(" / ");
-                    Serial.println(hidData, HEX);
+                #ifdef DEBUG
+                Serial.print("hidData: ");
+                Serial.print(hidData, DEC);
+                Serial.print(" / ");
+                Serial.println(hidData, HEX);
 
-                    Serial.print("ones: ");
-                    Serial.print(ones, DEC);
-                    Serial.print(" / ");
-                    Serial.println(ones, HEX);
+                Serial.print("ones: ");
+                Serial.print(ones, DEC);
+                Serial.print(" / ");
+                Serial.println(ones, HEX);
 
-                    Serial.print("tens: ");
-                    Serial.print(tens, DEC);
-                    Serial.print(" / ");
-                    Serial.println(tens, HEX);
+                Serial.print("tens: ");
+                Serial.print(tens, DEC);
+                Serial.print(" / ");
+                Serial.println(tens, HEX);
 
-                    Serial.println();
-                    #endif
-                    parseColor(ones);
-                    parseEffect(tens);
-                }
+                Serial.println();
+                #endif
+                parseColor(ones);
+                parseEffect(tens);
+            }  else {
+                #ifdef DEBUG
+                Serial.print("Invalid/Undocumented data: ");
+                Serial.print(ones);
+                Serial.print(tens);
+                Serial.print("/");
+                Serial.println(hidData, HEX); //TODO: display as hex/byte
+                #endif
             }
-            // if ( (ones >= 0 && ones <= 7) && (tens >= 0 && tens <= 3) ) {
-                // parseColor(ones);
-                // parseEffect(0);
-            // } else {
-            //     #ifdef DEBUG
-            //     Serial.print("Invalid/Undocumented data: ");
-            //     Serial.print(ones);
-            //     Serial.print(tens);
-            //     Serial.print("/");
-            //     Serial.println(hidData, HEX); //TODO: display as hex/byte
-            //     #endif
-            // }
 
         }
     }
