@@ -22,7 +22,7 @@ void Led::update() {
             shine();
             break;
         case LedEffect::dim:
-            this->brightness = 0;
+            this->brightness = 15;
             shine();
             break;
         case LedEffect::fast_pulse:
@@ -122,17 +122,32 @@ void Led::blink(unsigned int period) {
 */
 void Led::invertAnalogWrite(int pin, int value) {
     analogWrite(pin, 255 - value);
-    // Serial.println(value);
-    // analogWrite(pin, value);
 }
 
 /*
     Led::shine is a normal 'on' or 'dimmed' state
 */
 void Led::shine() {
-    invertAnalogWrite(this->red_pin, mapRed(this->color) * this->brightness);
-    invertAnalogWrite(this->green_pin, mapGreen(this->color) * this->brightness);
-    invertAnalogWrite(this->blue_pin, mapBlue(this->color) * this->brightness);
+    
+    #ifdef DEBUG
+    // Print out the color value once a second
+    if (millis() - last_refresh_time > 1000) {
+        Serial.println("Function is Led::shine()");
+        Serial.print("    this->brightness = ");
+        Serial.print(this->brightness);
+        Serial.print("    rgb *  = ");
+        Serial.print(mapRed(this->color) * this->brightness / 100 );
+        Serial.print(", ");
+        Serial.print(mapGreen(this->color) * this->brightness / 100 );
+        Serial.print(", ");
+        Serial.print(mapBlue(this->color) * this->brightness / 100);
+        Serial.println("");
+        last_refresh_time = millis();
+    }
+    #endif
+    invertAnalogWrite(this->red_pin, mapRed(this->color) * this->brightness / 100 );
+    invertAnalogWrite(this->green_pin, mapGreen(this->color) * this->brightness / 100);
+    invertAnalogWrite(this->blue_pin, mapBlue(this->color) * this->brightness / 100);
 }
 
 /*
