@@ -10,6 +10,12 @@ Visually see if you are muted in a zoom/teams meeting, and control your micropho
 
 ![](https://imgur.com/3XjUq6J.png)
 
+
+## CAD
+
+Gerber files are available in the [Gerber](./Gerber/) directory, and available on [https://oshwlab.com/owenspencer/muteme-arduino](https://oshwlab.com/owenspencer/muteme-arduino)
+
+PCB files are available at [https://oshwlab.com/owenspencer/muteme-arduino](https://oshwlab.com/owenspencer/muteme-arduino)
 ## Building
 
 **Q: Should you build this?**
