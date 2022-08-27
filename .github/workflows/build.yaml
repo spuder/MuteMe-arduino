@@ -24,7 +24,7 @@ jobs:
     - name: Install platformIO libraries
       run: pio lib install
     - name: Run PlatformIO
-      run: pio run -e sparkfun_promicro16 
+      run: pio run -e pro-micro-prototype -e pro-micro-prototype-debug
     - name: Archive firmware.hex
       uses: actions/upload-artifact@v3
       with:
