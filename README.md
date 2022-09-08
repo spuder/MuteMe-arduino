@@ -7,6 +7,9 @@ Visually see if you are muted in a zoom/teams meeting, and control your micropho
 ![](https://media.giphy.com/media/75K7kAUcbSqN1cserB/giphy.gif)
 
 ![](https://imgur.com/kRu2WNK.png)  
+
+![](https://imgur.com/pJLbuFA.png)
+
 ![](https://imgur.com/ZmdYOMP.png)
 
 ![](https://imgur.com/1W8cwSW.png)
