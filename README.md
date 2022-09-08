@@ -4,6 +4,9 @@ MuteMe-Arduino is an open source imlementation of the wildly populare [MuteMe ha
 
 Visually see if you are muted in a zoom/teams meeting, and control your microphone with the touch of a button. 
 
+![](https://media.giphy.com/media/75K7kAUcbSqN1cserB/giphy.gif)
+
+![](https://imgur.com/kRu2WNK.png)  
 ![](https://imgur.com/ZmdYOMP.png)
 
 ![](https://imgur.com/1W8cwSW.png)
