@@ -221,7 +221,7 @@ void setup()
     strip.Show();
 
     // power the button
-    digitalWrite(BUTTON_PWR,HIGH);
+    digitalWrite(BUTTON_PWR, HIGH);
 
     button.begin(BUTTON_PIN);
     button.setPressedHandler(pressed);
