@@ -2,7 +2,8 @@
 #include "Button2.h"
 #include "HID-Project.h"
 
-#define BUTTON_PIN 2
+#define BUTTON_PIN 9
+#define BUTTON_PWR 2
 
 #include <NeoPixelBus.h>
 #include <NeoPixelAnimator.h>
@@ -218,6 +219,9 @@ void setup()
 {
     strip.Begin();
     strip.Show();
+
+    // power the button
+    digitalWrite(BUTTON_PWR,HIGH);
 
     button.begin(BUTTON_PIN);
     button.setPressedHandler(pressed);
