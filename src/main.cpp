@@ -218,7 +218,15 @@ void setColor(RgbColor color, bool dimmer)
 void setup()
 {
     strip.Begin();
+    setColor(red, true);
     strip.Show();
+    delay(500);
+    setColor(green, true);
+    strip.Show();
+    delay(500);
+    setColor(blue, true);
+    strip.Show();
+    delay(500);
 
     // power the button
     digitalWrite(BUTTON_PWR, HIGH);
@@ -229,11 +237,11 @@ void setup()
     button.setReleasedHandler(released);
 
     // Workaround for bug when sending less than 64 bytes of data
-    for (byte i = 0; i < sizeof(rawhidData); i++)
-    {
-        rawhidData[i] = 0x00;
-    }
-    RawHID.begin(rawhidData, sizeof(rawhidData));
+    // for (byte i = 0; i < sizeof(rawhidData); i++)
+    // {
+    //     rawhidData[i] = 0x00;
+    // }
+    // RawHID.begin(rawhidData, sizeof(rawhidData));
 
 #ifdef DEBUG
     Serial.begin(115200);
