@@ -145,49 +145,59 @@ void loop()
     {
         while (bytesAvailable--)
         {
-            if(byte_count < 64) {
-                rawhidBuffer[byte_count] = RawHID.read();
-                byte_count++;
-            } else {
-                byte_count = 0;
-                // We only care about the first byte.
-                int hidData = rawhidBuffer[0];
-                int ones = ((byte)hidData / 1)  % 16;
-                int tens = ((byte)hidData / 16) % 16;
-
-                if ((ones >=0 && ones <= 7) && (tens >= 0 && tens <= 3) ) 
-                {
-                    #ifdef DEBUG
-                    Serial.print("hidData: ");
-                    Serial.print(hidData, DEC);
-                    Serial.print(" / 0x");
-                    Serial.println(hidData, HEX);
-
-                    Serial.print("ones: ");
-                    Serial.print(ones, DEC);
-                    Serial.print(" / 0x");
-                    Serial.println(ones, HEX);
-
-                    Serial.print("tens: ");
-                    Serial.print(tens, DEC);
-                    Serial.print(" / 0x");
-                    Serial.println(tens, HEX);
-
-                    Serial.println();
-                    #endif
-                    parseColor(ones);
-                    parseEffect(tens);
-                }  else {
-                    #ifdef DEBUG
-                    Serial.print("Invalid/Undocumented data: ");
-                    Serial.print(ones);
-                    Serial.print(tens);
-                    Serial.print("/0x");
-                    Serial.println(hidData, HEX);
-                    #endif
-                }
-            }
+            rawhidBuffer[byte_count] = RawHID.read();
+            byte_count++;
         }
+        // We only care about the first byte.
+        int hidData = rawhidBuffer[0];
+        int ones = ((byte)hidData / 1)  % 16;
+        int tens = ((byte)hidData / 16) % 16;
+
+        if ((ones >=0 && ones <= 7) && (tens >= 0 && tens <= 3) ) 
+        {
+            #ifdef DEBUG
+            Serial.print("hidData: ");
+            Serial.print(hidData, DEC);
+            Serial.print(" / 0x");
+            Serial.println(hidData, HEX);
+
+            Serial.print("ones: ");
+            Serial.print(ones, DEC);
+            Serial.print(" / 0x");
+            Serial.println(ones, HEX);
+
+            Serial.print("tens: ");
+            Serial.print(tens, DEC);
+            Serial.print(" / 0x");
+            Serial.println(tens, HEX);
+
+            Serial.println();
+            #endif
+            parseColor(ones);
+            parseEffect(tens);
+        }  else {
+            #ifdef DEBUG
+            Serial.print("Invalid/Undocumented data: ");
+            Serial.print(ones);
+            Serial.print(tens);
+            Serial.print("/0x");
+            Serial.println(hidData, HEX);
+            #endif
+        }
+        #ifdef DEBUG
+                for (byte i = 0; i < byte_count; i++)
+        {
+            Serial.print(rawhidBuffer[i], HEX);
+            Serial.print(" ");
+        }
+
+        Serial.println();
+
+        Serial.print("Byte Count: ");
+        Serial.println(byte_count, DEC);
+        #endif
+        // Reset our byte count once we have read the whole input buffer
+        byte_count = 0;
     }
 }
 
