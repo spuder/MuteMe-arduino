@@ -13,21 +13,29 @@
 
 Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
 Button2 button;
-byte rawhidData[64];
+// These are automatically zero initialized
+// This is our output buffer used by button presses
+byte rawhidWriteBuffer[64]; 
+// This is our input buffer used by RawHID
+byte rawhidInBuffer[64];
+// This is our 64b buffer to make sure we get 64b of input before processing
+byte rawhidBuffer[64];
+// Byte count to track input
+int byte_count = 0;
 
 void pressed(Button2& btn) {
-    rawhidData[3] = 0x04; // Touch Button
-    RawHID.write(rawhidData, sizeof(rawhidData));
-    rawhidData[3] = 0x00;
+    rawhidWriteBuffer[3] = 0x04; // Touch Button
+    RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
+    rawhidWriteBuffer[3] = 0x00;
     // #ifdef DEBUG
     // Serial.println("pressed");
     // #endif
 }
 
 void released(Button2& btn) {
-    rawhidData[3] = 0x02; // Release Button
-    RawHID.write(rawhidData, sizeof(rawhidData));
-    rawhidData[3] = 0x00;
+    rawhidWriteBuffer[3] = 0x02; // Release Button
+    RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
+    rawhidWriteBuffer[3] = 0x00;
     // #ifdef DEBUG
     // Serial.print("released: ");
     // Serial.println(btn.wasPressedFor());
@@ -35,9 +43,9 @@ void released(Button2& btn) {
 }
 
 void longClickDetected(Button2& btn) {
-    rawhidData[3] = 0x01; // Hold Button
-    RawHID.write(rawhidData, sizeof(rawhidData));
-    rawhidData[3] = 0x00;
+    rawhidWriteBuffer[3] = 0x01; // Hold Button
+    RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
+    rawhidWriteBuffer[3] = 0x00;
     #ifdef DEBUG
     Serial.println("long click detected\n");
     #endif 
@@ -113,11 +121,15 @@ void setup()
     button.setReleasedHandler(released);
 
     // Workaround for bug when sending less than 64 bytes of data
-    for (byte i = 0; i < sizeof(rawhidData); i++)
+    // Since arrays are zero init'd by default we shouldn't have to do this anymore
+    /* for (byte i = 0; i < sizeof(rawhidWriteBuffer); i++)
     {
-        rawhidData[i] = 0x00;
-    }
-    RawHID.begin(rawhidData, sizeof(rawhidData));
+        rawhidWriteBuffer[i] = 0x00;
+    } */
+
+    // There was a potential conflict before if you hit the button fast you could read in
+    // Garbage data from HID because the buffer would get overwritten by output
+    RawHID.begin(rawhidInBuffer, sizeof(rawhidInBuffer));
 
     #ifdef DEBUG
     Serial.begin(115200);
@@ -133,43 +145,59 @@ void loop()
     {
         while (bytesAvailable--)
         {
-            int hidData = RawHID.read();
-            int ones = ((byte)hidData / 1)  % 16;
-            int tens = ((byte)hidData / 16) % 16;
-
-            if ((ones >=0 && ones <= 7) && (tens >= 0 && tens <= 3) ) 
-            {
-                #ifdef DEBUG
-                Serial.print("hidData: ");
-                Serial.print(hidData, DEC);
-                Serial.print(" / ");
-                Serial.println(hidData, HEX);
-
-                Serial.print("ones: ");
-                Serial.print(ones, DEC);
-                Serial.print(" / ");
-                Serial.println(ones, HEX);
-
-                Serial.print("tens: ");
-                Serial.print(tens, DEC);
-                Serial.print(" / ");
-                Serial.println(tens, HEX);
-
-                Serial.println();
-                #endif
-                parseColor(ones);
-                parseEffect(tens);
-            }  else {
-                #ifdef DEBUG
-                Serial.print("Invalid/Undocumented data: ");
-                Serial.print(ones);
-                Serial.print(tens);
-                Serial.print("/");
-                Serial.println(hidData, HEX);
-                #endif
-            }
-
+            rawhidBuffer[byte_count] = RawHID.read();
+            byte_count++;
         }
+        // We only care about the first byte.
+        int hidData = rawhidBuffer[0];
+        int ones = ((byte)hidData / 1)  % 16;
+        int tens = ((byte)hidData / 16) % 16;
+
+        if ((ones >=0 && ones <= 7) && (tens >= 0 && tens <= 3) ) 
+        {
+            #ifdef DEBUG
+            Serial.print("hidData: ");
+            Serial.print(hidData, DEC);
+            Serial.print(" / 0x");
+            Serial.println(hidData, HEX);
+
+            Serial.print("ones: ");
+            Serial.print(ones, DEC);
+            Serial.print(" / 0x");
+            Serial.println(ones, HEX);
+
+            Serial.print("tens: ");
+            Serial.print(tens, DEC);
+            Serial.print(" / 0x");
+            Serial.println(tens, HEX);
+
+            Serial.println();
+            #endif
+            parseColor(ones);
+            parseEffect(tens);
+        }  else {
+            #ifdef DEBUG
+            Serial.print("Invalid/Undocumented data: ");
+            Serial.print(ones);
+            Serial.print(tens);
+            Serial.print("/0x");
+            Serial.println(hidData, HEX);
+            #endif
+        }
+        #ifdef DEBUG
+                for (byte i = 0; i < byte_count; i++)
+        {
+            Serial.print(rawhidBuffer[i], HEX);
+            Serial.print(" ");
+        }
+
+        Serial.println();
+
+        Serial.print("Byte Count: ");
+        Serial.println(byte_count, DEC);
+        #endif
+        // Reset our byte count once we have read the whole input buffer
+        byte_count = 0;
     }
 }
 
