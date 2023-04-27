@@ -1,9 +1,17 @@
+/**
+
+ */
 #include "Arduino.h"
 #include "Button2.h"
 #include "HID-Project.h"
+// #include "Led.h"
+
+// #define BUTTON_PIN 2
 
 #define BUTTON_PIN 9
 #define BUTTON_PWR 2
+
+// Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
 
 #include <NeoPixelBus.h>
 #include <NeoPixelAnimator.h>
@@ -48,45 +56,47 @@ struct MyAnimationState
 // one entry per pixel to match the animation timing manager
 MyAnimationState animationState[AnimationChannels];
 
-// Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
 Button2 button;
-byte rawhidData[64];
+// These are automatically zero initialized
+// This is our output buffer used by button presses
+byte rawhidWriteBuffer[64];
+// This is our input buffer used by RawHID
+byte rawhidInBuffer[64];
+// This is our 64b buffer to make sure we get 64b of input before processing
+byte rawhidBuffer[64];
+// Byte count to track input
+int byte_count = 0;
 
-void pressed(Button2 &btn)
-{
-    rawhidData[3] = 0x04; // Touch Button
-    RawHID.write(rawhidData, sizeof(rawhidData));
-    rawhidData[3] = 0x00;
-    // #ifdef DEBUG
-    // Serial.println("pressed");
-    // #endif
+void pressed(Button2 &btn) {
+  rawhidWriteBuffer[3] = 0x04;  // Touch Button
+  RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
+  rawhidWriteBuffer[3] = 0x00;
+  // #ifdef DEBUG
+  // Serial.println("pressed");
+  // #endif
 }
 
-void released(Button2 &btn)
-{
-    rawhidData[3] = 0x02; // Release Button
-    RawHID.write(rawhidData, sizeof(rawhidData));
-    rawhidData[3] = 0x00;
-    // #ifdef DEBUG
-    // Serial.print("released: ");
-    // Serial.println(btn.wasPressedFor());
-    // #endif
+void released(Button2 &btn) {
+  rawhidWriteBuffer[3] = 0x02;  // Release Button
+  RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
+  rawhidWriteBuffer[3] = 0x00;
+  // #ifdef DEBUG
+  // Serial.print("released: ");
+  // Serial.println(btn.wasPressedFor());
+  // #endif
 }
 
-void longClickDetected(Button2 &btn)
-{
-    rawhidData[3] = 0x01; // Hold Button
-    RawHID.write(rawhidData, sizeof(rawhidData));
-    rawhidData[3] = 0x00;
+void longClickDetected(Button2 &btn) {
+  rawhidWriteBuffer[3] = 0x01;  // Hold Button
+  RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
+  rawhidWriteBuffer[3] = 0x00;
 #ifdef DEBUG
-    Serial.println("long click detected\n");
+  Serial.println("long click detected\n");
 #endif
 }
 
-void parseColor(int data)
-{
-    switch (data)
-    {
+void parseColor(int data) {
+  switch (data) {
     case 0:
         actual_color = black;
         break;
@@ -115,35 +125,32 @@ void parseColor(int data)
         // sent fromt the software. We want to ignore those
     }
 }
-
-void parseEffect(int data)
-{
+void parseEffect(int data) {
 #ifdef DEBUG
-    Serial.print("parseEffect: ");
-    Serial.println(data);
+  Serial.print("parseEffect: ");
+  Serial.println(data);
 #endif
-    switch (data)
-    {
+  switch (data) {
     case 0:
-        Serial.println("bright");
-        actual_status = 1;
-        break;
+      Serial.println("bright");
+      actual_status = 1;
+      break;
     case 1:
-        Serial.println("dim");
-        actual_status = 2;
-        break;
+      Serial.println("dim");
+      actual_status = 2;
+      break;
     case 2:
-        Serial.println("fast_pulse");
-        actual_time = fast;
-        actual_status = 3;
-        break;
+      Serial.println("fast_pulse");
+      actual_time = fast;
+      actual_status = 3;
+      break;
     case 3:
-        Serial.println("slow_pulse");
-        actual_status = 3;
-        actual_time = slow;
-        break;
-        // Don't set a default case, since there appear to be some undocumented values
-        // sent fromt the software. We want to ignore those
+      Serial.println("slow_pulse");
+      actual_status = 3;
+      actual_time = slow;
+      break;
+      // Don't set a default case, since there appear to be some undocumented
+      // values sent fromt the software. We want to ignore those
     }
 }
 
@@ -217,84 +224,103 @@ void setColor(RgbColor color, bool dimmer)
 
 void setup()
 {
-    strip.Begin();
-    setColor(red, true);
-    strip.Show();
-    delay(500);
-    setColor(green, true);
-    strip.Show();
-    delay(500);
-    setColor(blue, true);
-    strip.Show();
-    delay(500);
+  // Led.setColor(LedColor::no_color);
+  // Led.setEffect(LedEffect::bright);
+  strip.Begin();
+  setColor(red, true);
+  strip.Show();
+  delay(500);
+  setColor(green, true);
+  strip.Show();
+  delay(500);
+  setColor(blue, true);
+  strip.Show();
+  delay(500);
 
-    // power the button
-    digitalWrite(BUTTON_PWR, HIGH);
+  // power the button
+  digitalWrite(BUTTON_PWR, HIGH);
 
-    button.begin(BUTTON_PIN);
-    button.setPressedHandler(pressed);
-    button.setLongClickDetectedHandler(longClickDetected);
-    button.setReleasedHandler(released);
+  button.begin(BUTTON_PIN);
+  button.setPressedHandler(pressed);
+  button.setLongClickDetectedHandler(longClickDetected);
+  button.setReleasedHandler(released);
 
-    // Workaround for bug when sending less than 64 bytes of data
-    // for (byte i = 0; i < sizeof(rawhidData); i++)
-    // {
-    //     rawhidData[i] = 0x00;
-    // }
-    // RawHID.begin(rawhidData, sizeof(rawhidData));
+  // Workaround for bug when sending less than 64 bytes of data
+  // Since arrays are zero init'd by default we shouldn't have to do this
+  // anymore
+  /* for (byte i = 0; i < sizeof(rawhidWriteBuffer); i++)
+  {
+      rawhidWriteBuffer[i] = 0x00;
+  } */
+
+  // There was a potential conflict before if you hit the button fast you could
+  // read in Garbage data from HID because the buffer would get overwritten by
+  // output
+  RawHID.begin(rawhidInBuffer, sizeof(rawhidInBuffer));
 
 #ifdef DEBUG
-    Serial.begin(115200);
+  Serial.begin(115200);
 #endif
 }
 
-void loop()
-{
-    button.loop();
-    int bytesAvailable = RawHID.available();
-    if (bytesAvailable > 0)
-    {
-        while (bytesAvailable--)
-        {
-            int hidData = RawHID.read();
-            int ones = ((byte)hidData / 1) % 16;
-            int tens = ((byte)hidData / 16) % 16;
-
-            if ((ones >= 0 && ones <= 7) && (tens >= 0 && tens <= 3))
-            {
-#ifdef DEBUG
-                Serial.print("hidData: ");
-                Serial.print(hidData, DEC);
-                Serial.print(" / ");
-                Serial.println(hidData, HEX);
-
-                Serial.print("ones: ");
-                Serial.print(ones, DEC);
-                Serial.print(" / ");
-                Serial.println(ones, HEX);
-
-                Serial.print("tens: ");
-                Serial.print(tens, DEC);
-                Serial.print(" / ");
-                Serial.println(tens, HEX);
-
-                Serial.println();
-#endif
-                parseColor(ones);
-                parseEffect(tens);
-            }
-            else
-            {
-#ifdef DEBUG
-                Serial.print("Invalid/Undocumented data: ");
-                Serial.print(ones);
-                Serial.print(tens);
-                Serial.print("/");
-                Serial.println(hidData, HEX);
-#endif
-            }
-        }
+void loop() {
+  // Led.update();
+  button.loop();
+  int bytesAvailable = RawHID.available();
+  if (bytesAvailable > 0) {
+    while (bytesAvailable--) {
+      rawhidBuffer[byte_count] = RawHID.read();
+      byte_count++;
     }
+    // We only care about the first byte.
+    int hidData = rawhidBuffer[0];
+    int ones = ((byte)hidData / 1) % 16;
+    int tens = ((byte)hidData / 16) % 16;
+
+    if ((ones >= 0 && ones <= 7) && (tens >= 0 && tens <= 3)) {
+#ifdef DEBUG
+      Serial.print("hidData: ");
+      Serial.print(hidData, DEC);
+      Serial.print(" / 0x");
+      Serial.println(hidData, HEX);
+
+      Serial.print("ones: ");
+      Serial.print(ones, DEC);
+      Serial.print(" / 0x");
+      Serial.println(ones, HEX);
+
+      Serial.print("tens: ");
+      Serial.print(tens, DEC);
+      Serial.print(" / 0x");
+      Serial.println(tens, HEX);
+
+      Serial.println();
+#endif
+      parseColor(ones);
+      parseEffect(tens);
+    } else {
+#ifdef DEBUG
+      Serial.print("Invalid/Undocumented data: ");
+      Serial.print(ones);
+      Serial.print(tens);
+      Serial.print("/0x");
+      Serial.println(hidData, HEX);
+#endif
+    }
+#ifdef DEBUG
+    for (byte i = 0; i < byte_count; i++) {
+      Serial.print(rawhidBuffer[i], HEX);
+      Serial.print(" ");
+    }
+
+    Serial.println();
+
+    Serial.print("Byte Count: ");
+    Serial.println(byte_count, DEC);
+#endif
+    // Reset our byte count once we have read the whole input buffer
+    byte_count = 0;
+  }
 
     if (actual_status == 3)
     {
