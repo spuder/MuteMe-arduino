@@ -4,14 +4,10 @@
 #include "Arduino.h"
 #include "Button2.h"
 #include "HID-Project.h"
-// #include "Led.h"
 
-// #define BUTTON_PIN 2
-
+#ifdef NEOPIXEL
 #define BUTTON_PIN 9
 #define BUTTON_PWR 2
-
-// Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
 
 #include <NeoPixelBus.h>
 #include <NeoPixelAnimator.h>
@@ -55,6 +51,18 @@ struct MyAnimationState
 
 // one entry per pixel to match the animation timing manager
 MyAnimationState animationState[AnimationChannels];
+
+#else
+#include "Led.h"
+
+#define BUTTON_PIN 2
+#define RED_PIN    6
+#define GREEN_PIN  9
+#define BLUE_PIN   10
+Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
+#endif
+
+
 
 Button2 button;
 // These are automatically zero initialized
