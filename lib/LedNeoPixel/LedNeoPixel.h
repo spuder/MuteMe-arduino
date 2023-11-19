@@ -9,15 +9,15 @@ class LedNeoPixel {
     private:
         LedColor color;
         LedEffect effect;
-        void AnimationControl(RgbColor color, uint16_t time);
+        void AnimationStart(RgbColor color, uint16_t time);
         void brighten(RgbColor color);
         void darken(RgbColor color);
-        // void BlendAnimUpdate(const AnimationParam &param);
         void FadeInFadeOutRinseRepeat(float luminance, RgbColor target, uint16_t time);
         void setColorRgb(RgbColor color);
         RgbColor actual_color;
     public:
         void initStrip();
+        void debugColors();
         void update();
         void setEffect(LedEffect effect);
         void setColor(LedColor color);

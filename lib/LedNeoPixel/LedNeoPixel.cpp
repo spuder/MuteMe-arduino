@@ -1,8 +1,4 @@
-// # include <Arduino.h>
 # include <LedNeoPixel.h>
-// # include <Led.h>
-// # include <NeoPixelBus.h>
-// # include <NeoPixelAnimator.h>
 
 boolean fadeToColor = false;
 const uint16_t colorSaturation=128;
@@ -13,7 +9,7 @@ const uint8_t PixelPin = 8;
 const uint8_t AnimationChannels = 1;
 
 uint16_t fast = 500;
-uint16_t slow = 2000;
+uint16_t slow = 2500;
 uint16_t actual_time = 0;
 
 RgbColor actual_color(0);
@@ -36,18 +32,23 @@ void LedNeoPixel::initStrip()
     strip.Show();
 }
 
+void LedNeoPixel::debugColors() {
+    LedColor colors[4] = {red, green, blue, no_color};
+    for (size_t i = 0; i < 4; i++)
+    {
+        setColor(colors[i]);
+        strip.Show();
+        delay(400);
+    }
+}
+
 void BlendAnimUpdate(const AnimationParam &param)
 {
-    // this gets called for each animation on every time step
-    // progress will start at 0.0 and end at 1.0
-    // we use the blend function on the RgbColor to mix
-    // color based on the progress given to us in the animation
     RgbColor updatedColor = RgbColor::LinearBlend(
         animationState[param.index].StartingColor,
         animationState[param.index].EndingColor,
         param.progress);
 
-    // apply the color to the strip
     for (uint16_t pixel = 0; pixel < PixelCount; pixel++)
     {
         strip.SetPixelColor(pixel, updatedColor);
@@ -58,30 +59,18 @@ void LedNeoPixel::FadeInFadeOutRinseRepeat(float luminance, RgbColor target, uin
 {
     if (fadeToColor)
     {
-        // Fade upto a random color
-        // we use HslColor object as it allows us to easily pick a hue
-        // with the same saturation and luminance so the colors picked
-        // will have similiar overall brightness
-        // RgbColor target = HslColor(random(360) / 360.0f, 1.0f, luminance);
-        // uint16_t time = random(800, 2000);
-
         animationState[0].StartingColor = strip.GetPixelColor(0);
         animationState[0].EndingColor = target;
-
         animations.StartAnimation(0, time, BlendAnimUpdate);
     }
     else
     {
-        // fade to black
-        uint16_t time = random(600, 700);
 
+        uint16_t time = random(600, 700);
         animationState[0].StartingColor = strip.GetPixelColor(0);
         animationState[0].EndingColor = RgbColor(0);
-
         animations.StartAnimation(0, time, BlendAnimUpdate);
     }
-
-    // toggle to the next effect state
     fadeToColor = !fadeToColor;
 }
 
@@ -133,47 +122,46 @@ void LedNeoPixel::setEffect(LedEffect effect) {
 
 void LedNeoPixel::brighten(RgbColor color) {
     RgbColor dimmed_color = color.Dim(dimFactor);
-    // dimmed_color = dimmed_color.Dim(dimFactor);
     setColorRGB(dimmed_color);
 }
 
 void LedNeoPixel::darken(RgbColor color) {
     RgbColor dimmed_color = color.Brighten(dimFactor);
-    // dimmed_color = dimmed_color.Brighten(dimFactor);
     setColorRGB(dimmed_color);
 }
 
-void LedNeoPixel::AnimationControl(RgbColor color, uint16_t time) {
+void LedNeoPixel::AnimationStart(RgbColor color, uint16_t time) {
+    FadeInFadeOutRinseRepeat(0.25, color, time);
+}
+
+void LedNeoPixel::update() {
     if (animations.IsAnimating())
     {
         animations.UpdateAnimations();
         strip.Show();
     }
-    else
-    {
-        FadeInFadeOutRinseRepeat(0.25, color, time);
-    }
-}
-
-void LedNeoPixel::update() {
     switch (this->effect) {
-        case LedEffect::bright:
-            animations.StopAll();
-            brighten(strip.GetPixelColor(0));
-            strip.Show();
-            break;
         case LedEffect::dim:
             animations.StopAll();
-            darken(strip.GetPixelColor(0));
+            brighten(actual_color);
+            strip.Show();
+            break;
+        case LedEffect::bright:
+            animations.StopAll();
+            darken(actual_color);
             strip.Show();
             break;
         case LedEffect::fast_pulse:
             actual_time = fast;
-            AnimationControl(strip.GetPixelColor(0), actual_time);
+            if (!animations.IsAnimating()) {
+                AnimationStart(actual_color, actual_time);
+            }
             break;
         case LedEffect::slow_pulse:
             actual_time = slow;
-            AnimationControl(strip.GetPixelColor(0), actual_time);
+            if (!animations.IsAnimating()) {
+                AnimationStart(actual_color, actual_time);
+            }
             break;
     }
 }

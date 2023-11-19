@@ -123,17 +123,11 @@ void parseEffect(int data) {
 
 void setup() {
 #ifdef NEOPIXEL
-//   Led.setColor(red);
-//   strip.Show();
-//   delay(500);
-//   Led.setColor(green);
-//   strip.Show();
-//   delay(500);
-//   Led.setColor(blue);
-//   strip.Show();
-//   delay(500);
-  // power the button
+  #ifdef DEBUG
+    Led.debugColors();
+  #endif
   Led.initStrip();
+  // power the button
   digitalWrite(BUTTON_PWR, HIGH);
 #else
   Led.setColor(LedColor::no_color);
