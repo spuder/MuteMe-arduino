@@ -7,11 +7,11 @@ Led::Led(byte red_pin, byte green_pin, byte blue_pin) {
     this->blue_pin = blue_pin;
     this->effect = LedEffect::bright;
     this->color = LedColor::no_color;
-    this->brightness = 0; 
+    this->brightness = 0;
     this->last_refresh_time = 0;
 }
 
-/* 
+/*
     Led::update() is the state machine that manages the LED state
     These states are sent from the MuteMe software
 */
@@ -64,7 +64,7 @@ void Led::setColor(LedColor color) {
 /*
     Led::pulse is the fading or breathing animation
     It uses a gausian function to fade the LED from 0 to 255
-    Facinating article about the math here: 
+    Facinating article about the math here:
     https://makersportal.com/blog/2020/3/27/simple-breathing-led-in-arduino
     https://thingpulse.com/breathing-leds-cracking-the-algorithm-behind-our-breathing-pattern/
 */
@@ -128,7 +128,7 @@ void Led::invertAnalogWrite(int pin, int value) {
     Led::shine is a normal 'on' or 'dimmed' state
 */
 void Led::shine() {
-    
+
     #ifdef DEBUG
     // Print out the color value once a second
     if (millis() - last_refresh_time > 1000) {

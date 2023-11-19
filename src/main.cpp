@@ -9,60 +9,21 @@
 #define BUTTON_PIN 9
 #define BUTTON_PWR 2
 
-#include <NeoPixelBus.h>
-#include <NeoPixelAnimator.h>
+#include <LedNeoPixel.h>
 
-const uint16_t PixelCount = 12;
-const uint8_t PixelPin = 8;
-const uint8_t AnimationChannels = 1;
-
-#define colorSaturation 128
-#define dimFactor 200
-
-NeoPixelBus<NeoGrbFeature, NeoWs2812xMethod> strip(PixelCount, PixelPin);
-
-RgbColor red(colorSaturation, 0, 0);
-RgbColor green(0, colorSaturation, 0);
-RgbColor blue(0, 0, colorSaturation);
-RgbColor white(colorSaturation);
-RgbColor yellow(colorSaturation, colorSaturation, 0);
-RgbColor purple(colorSaturation, 0, colorSaturation);
-RgbColor cyan(0, colorSaturation, colorSaturation);
-RgbColor black(0);
-RgbColor actual_color(0);
-
-uint16_t fast = 500;
-uint16_t slow = 2000;
-uint16_t actual_time = 0;
-
-uint8_t actual_status = 1;
-
-bool dim = false;
-
-NeoPixelAnimator animations(AnimationChannels); // NeoPixel animation management object
-
-boolean fadeToColor = false; // general purpose variable used to store effect state
-
-struct MyAnimationState
-{
-    RgbColor StartingColor;
-    RgbColor EndingColor;
-};
-
-// one entry per pixel to match the animation timing manager
-MyAnimationState animationState[AnimationChannels];
+LedNeoPixel Led;
 
 #else
+
 #include "Led.h"
 
 #define BUTTON_PIN 2
-#define RED_PIN    6
-#define GREEN_PIN  9
-#define BLUE_PIN   10
-Led Led(RED_PIN, GREEN_PIN, BLUE_PIN );
+#define RED_PIN 6
+#define GREEN_PIN 9
+#define BLUE_PIN 10
+
+Led Led(RED_PIN, GREEN_PIN, BLUE_PIN);
 #endif
-
-
 
 Button2 button;
 // These are automatically zero initialized
@@ -98,155 +59,86 @@ void longClickDetected(Button2 &btn) {
   rawhidWriteBuffer[3] = 0x01;  // Hold Button
   RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
   rawhidWriteBuffer[3] = 0x00;
-#ifdef DEBUG
+  #ifdef DEBUG
   Serial.println("long click detected\n");
-#endif
+  #endif
 }
 
 void parseColor(int data) {
-  switch (data) {
-    case 0:
-        actual_color = black;
-        break;
-    case 1:
-        actual_color = red;
-        break;
-    case 2:
-        actual_color = green;
-        break;
-    case 3:
-        actual_color = yellow;
-        break;
-    case 4:
-        actual_color = blue;
-        break;
-    case 5:
-        actual_color = purple;
-        break;
-    case 6:
-        actual_color = cyan;
-        break;
-    case 7:
-        actual_color = white;
-        break;
-        // Don't set a default case, since there appear to be some undocumented values
-        // sent fromt the software. We want to ignore those
-    }
+    switch (data) {
+        case 0:
+            Led.setColor(LedColor::no_color);
+            break;
+        case 1:
+            Led.setColor(LedColor::red);
+            break;
+        case 2:
+            Led.setColor(LedColor::green);
+            break;
+        case 3:
+            Led.setColor(LedColor::yellow);
+            break;
+        case 4:
+            Led.setColor(LedColor::blue);
+            break;
+        case 5:
+            Led.setColor(LedColor::purple);
+            break;
+        case 6:
+            Led.setColor(LedColor::cyan);
+            break;
+        case 7:
+            Led.setColor(LedColor::white);
+            break;
+      // Don't set a default case, since there appear to be some undocumented
+      // values sent fromt the software. We want to ignore those
+  }
 }
 void parseEffect(int data) {
 #ifdef DEBUG
   Serial.print("parseEffect: ");
   Serial.println(data);
 #endif
-  switch (data) {
-    case 0:
-      Serial.println("bright");
-      actual_status = 1;
-      break;
-    case 1:
-      Serial.println("dim");
-      actual_status = 2;
-      break;
-    case 2:
-      Serial.println("fast_pulse");
-      actual_time = fast;
-      actual_status = 3;
-      break;
-    case 3:
-      Serial.println("slow_pulse");
-      actual_status = 3;
-      actual_time = slow;
-      break;
+    switch (data) {
+        case 0:
+            Serial.println("bright");
+            Led.setEffect(LedEffect::bright);
+            break;
+        case 1:
+            Serial.println("dim");
+            Led.setEffect(LedEffect::dim);
+            break;
+        case 2:
+            Serial.println("fast_pulse");
+            Led.setEffect(LedEffect::fast_pulse);
+            break;
+        case 3:
+            Serial.println("slow_pulse");
+            Led.setEffect(LedEffect::slow_pulse);
+            break;
       // Don't set a default case, since there appear to be some undocumented
       // values sent fromt the software. We want to ignore those
-    }
+  }
 }
 
-// simple blend function
-void BlendAnimUpdate(const AnimationParam &param)
-{
-    // this gets called for each animation on every time step
-    // progress will start at 0.0 and end at 1.0
-    // we use the blend function on the RgbColor to mix
-    // color based on the progress given to us in the animation
-    RgbColor updatedColor = RgbColor::LinearBlend(
-        animationState[param.index].StartingColor,
-        animationState[param.index].EndingColor,
-        param.progress);
-
-    // apply the color to the strip
-    for (uint16_t pixel = 0; pixel < PixelCount; pixel++)
-    {
-        strip.SetPixelColor(pixel, updatedColor);
-    }
-}
-
-void FadeInFadeOutRinseRepeat(float luminance, RgbColor target, uint16_t time)
-{
-    if (fadeToColor)
-    {
-        // Fade upto a random color
-        // we use HslColor object as it allows us to easily pick a hue
-        // with the same saturation and luminance so the colors picked
-        // will have similiar overall brightness
-        // RgbColor target = HslColor(random(360) / 360.0f, 1.0f, luminance);
-        // uint16_t time = random(800, 2000);
-
-        animationState[0].StartingColor = strip.GetPixelColor(0);
-        animationState[0].EndingColor = target;
-
-        animations.StartAnimation(0, time, BlendAnimUpdate);
-    }
-    else
-    {
-        // fade to black
-        uint16_t time = random(600, 700);
-
-        animationState[0].StartingColor = strip.GetPixelColor(0);
-        animationState[0].EndingColor = RgbColor(0);
-
-        animations.StartAnimation(0, time, BlendAnimUpdate);
-    }
-
-    // toggle to the next effect state
-    fadeToColor = !fadeToColor;
-}
-
-void setColor(RgbColor color, bool dimmer)
-{
-    RgbColor dimmed_color = color;
-    if (dimmer)
-    {
-        dimmed_color = dimmed_color.Dim(dimFactor);
-    }
-    else
-    {
-        dimmed_color = dimmed_color.Brighten(dimFactor);
-    }
-    // apply the color to the strip
-    for (uint16_t pixel = 0; pixel < PixelCount; pixel++)
-    {
-        strip.SetPixelColor(pixel, dimmed_color);
-    }
-}
-
-void setup()
-{
-  // Led.setColor(LedColor::no_color);
-  // Led.setEffect(LedEffect::bright);
-  strip.Begin();
-  setColor(red, true);
-  strip.Show();
-  delay(500);
-  setColor(green, true);
-  strip.Show();
-  delay(500);
-  setColor(blue, true);
-  strip.Show();
-  delay(500);
-
+void setup() {
+#ifdef NEOPIXEL
+//   Led.setColor(red);
+//   strip.Show();
+//   delay(500);
+//   Led.setColor(green);
+//   strip.Show();
+//   delay(500);
+//   Led.setColor(blue);
+//   strip.Show();
+//   delay(500);
   // power the button
+  Led.initStrip();
   digitalWrite(BUTTON_PWR, HIGH);
+#else
+  Led.setColor(LedColor::no_color);
+  Led.setEffect(LedEffect::bright);
+#endif
 
   button.begin(BUTTON_PIN);
   button.setPressedHandler(pressed);
@@ -272,7 +164,7 @@ void setup()
 }
 
 void loop() {
-  // Led.update();
+  Led.update();
   button.loop();
   int bytesAvailable = RawHID.available();
   if (bytesAvailable > 0) {
@@ -329,34 +221,4 @@ void loop() {
     // Reset our byte count once we have read the whole input buffer
     byte_count = 0;
   }
-
-    if (actual_status == 3)
-    {
-        if (animations.IsAnimating())
-        {
-            // the normal loop just needs these two to run the active animations
-            animations.UpdateAnimations();
-            strip.Show();
-        }
-        else
-        {
-            // no animation runnning, start some
-            //
-            FadeInFadeOutRinseRepeat(0.25, actual_color, actual_time); // 0.0 = black, 0.25 is normal, 0.5 is bright
-        }
-    }
-    else
-    {
-        if (actual_status == 2)
-        {
-            dim = true;
-        }
-        else
-        {
-            dim = false;
-        }
-        animations.StopAll();
-        setColor(actual_color, dim);
-        strip.Show();
-    }
 }
