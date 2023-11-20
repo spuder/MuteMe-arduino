@@ -6,12 +6,25 @@
 #include "HID-Project.h"
 #include "Led.h"
 
+#ifdef NEOPIXEL
+#define BUTTON_PIN 9
+#define BUTTON_PWR 2
+
+#include <LedNeoPixel.h>
+
+LedNeoPixel Led;
+
+#else
+
+#include "Led.h"
+
 #define BUTTON_PIN 2
 #define RED_PIN 6
 #define GREEN_PIN 9
 #define BLUE_PIN 10
-
 Led Led(RED_PIN, GREEN_PIN, BLUE_PIN);
+#endif
+
 Button2 button;
 // These are automatically zero initialized
 // This is our output buffer used by button presses
@@ -46,37 +59,37 @@ void longClickDetected(Button2 &btn) {
   rawhidWriteBuffer[3] = 0x01;  // Hold Button
   RawHID.write(rawhidWriteBuffer, sizeof(rawhidWriteBuffer));
   rawhidWriteBuffer[3] = 0x00;
-#ifdef DEBUG
+  #ifdef DEBUG
   Serial.println("long click detected\n");
-#endif
+  #endif
 }
 
 void parseColor(int data) {
-  switch (data) {
-    case 0:
-      Led.setColor(LedColor::no_color);
-      break;
-    case 1:
-      Led.setColor(LedColor::red);
-      break;
-    case 2:
-      Led.setColor(LedColor::green);
-      break;
-    case 3:
-      Led.setColor(LedColor::yellow);
-      break;
-    case 4:
-      Led.setColor(LedColor::blue);
-      break;
-    case 5:
-      Led.setColor(LedColor::purple);
-      break;
-    case 6:
-      Led.setColor(LedColor::cyan);
-      break;
-    case 7:
-      Led.setColor(LedColor::white);
-      break;
+    switch (data) {
+        case 0:
+            Led.setColor(LedColor::no_color);
+            break;
+        case 1:
+            Led.setColor(LedColor::red);
+            break;
+        case 2:
+            Led.setColor(LedColor::green);
+            break;
+        case 3:
+            Led.setColor(LedColor::yellow);
+            break;
+        case 4:
+            Led.setColor(LedColor::blue);
+            break;
+        case 5:
+            Led.setColor(LedColor::purple);
+            break;
+        case 6:
+            Led.setColor(LedColor::cyan);
+            break;
+        case 7:
+            Led.setColor(LedColor::white);
+            break;
       // Don't set a default case, since there appear to be some undocumented
       // values sent fromt the software. We want to ignore those
   }
@@ -86,31 +99,40 @@ void parseEffect(int data) {
   Serial.print("parseEffect: ");
   Serial.println(data);
 #endif
-  switch (data) {
-    case 0:
-      Serial.println("bright");
-      Led.setEffect(LedEffect::bright);
-      break;
-    case 1:
-      Serial.println("dim");
-      Led.setEffect(LedEffect::dim);
-      break;
-    case 2:
-      Serial.println("fast_pulse");
-      Led.setEffect(LedEffect::fast_pulse);
-      break;
-    case 3:
-      Serial.println("slow_pulse");
-      Led.setEffect(LedEffect::slow_pulse);
-      break;
+    switch (data) {
+        case 0:
+            Serial.println("bright");
+            Led.setEffect(LedEffect::bright);
+            break;
+        case 1:
+            Serial.println("dim");
+            Led.setEffect(LedEffect::dim);
+            break;
+        case 2:
+            Serial.println("fast_pulse");
+            Led.setEffect(LedEffect::fast_pulse);
+            break;
+        case 3:
+            Serial.println("slow_pulse");
+            Led.setEffect(LedEffect::slow_pulse);
+            break;
       // Don't set a default case, since there appear to be some undocumented
       // values sent fromt the software. We want to ignore those
   }
 }
 
 void setup() {
+#ifdef NEOPIXEL
+  #ifdef DEBUG
+    Led.debugColors();
+  #endif
+  Led.initStrip();
+  // power the button
+  digitalWrite(BUTTON_PWR, HIGH);
+#else
   Led.setColor(LedColor::no_color);
   Led.setEffect(LedEffect::bright);
+#endif
 
   button.begin(BUTTON_PIN);
   button.setPressedHandler(pressed);
