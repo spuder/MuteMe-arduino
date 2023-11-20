@@ -1,6 +1,6 @@
 # MuteMe-Arduino
 
-MuteMe-Arduino is an open source imlementation of the wildly populare [MuteMe hardware device](https://muteme.com/). 
+MuteMe-Arduino is an open source implementation of the wildly popular [MuteMe hardware device](https://muteme.com/). 
 
 Visually see if you are muted in a zoom/teams meeting, and control your microphone with the touch of a button. 
 
@@ -222,7 +222,7 @@ Attempting to use `build_flags = -D USB_SERIAL_HID` will allow you to add debugg
 
 ## Warning
 
-This project is provided for eduacational purposes only. Comercial products are prohibited.  
+This project is provided for educational purposes only. Comercial products are prohibited.  
 
 MuteMe-Arduino is licensed under the [Creative Commons Non Commercial ShareAlike](https://creativecommons.org/licenses/by-nc-sa/4.0/) license. 
 

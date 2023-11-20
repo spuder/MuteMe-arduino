@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "Button2.h"
 #include "HID-Project.h"
+#include "Led.h"
 
 #ifdef NEOPIXEL
 #define BUTTON_PIN 9
@@ -21,7 +22,6 @@ LedNeoPixel Led;
 #define RED_PIN 6
 #define GREEN_PIN 9
 #define BLUE_PIN 10
-
 Led Led(RED_PIN, GREEN_PIN, BLUE_PIN);
 #endif
 
